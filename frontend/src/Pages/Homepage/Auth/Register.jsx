@@ -663,7 +663,7 @@ const Register = ({ setActivePage }) => {
               </div>
             )}
 
-            <div className="login-link">
+            <div  style={{paddingTop:20,textAlign:'center'}}>
               Already have an account? <a href="/signin">Sign In</a>
             </div>
           </form>

@@ -28,12 +28,12 @@
 .content {
   flex: 1;
   padding: 20px;
-  margin-left: 190px; /* Column 1 width */
+  margin-left: 140px; /* Column 1 width */
   height: 100%;
   overflow-y: auto;
   background: #f8fafc;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: calc(100% - 170px); /* Full width minus column 1 */
+  width: calc(100% - 120px); /* Full width minus column 1 */
 }
 
 

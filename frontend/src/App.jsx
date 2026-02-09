@@ -5,9 +5,9 @@ import Navbar from './Component/Navbar/Navbar';
 import Homepage from './Pages/Homepage/Homepage';
 import SignIn from './Pages/Homepage/Auth/SignIn';
 import Register from './Pages/Homepage/Auth/Register';
-import Dashboard from './Pages/Homepage/Dashboard/Dashboard';
+
 import './App.css';
-import './Pages/Homepage/Auth/Auth.css';
+// import './Pages/Homepage/Auth/Auth.css';
 
 function App() {
   const [activePage, setActivePage] = useState('home');
@@ -71,7 +71,7 @@ function App() {
               {/* Auth routes */}
               <Route path="/signin" element={<SignIn setActivePage={setActivePage} />} />
               <Route path="/register" element={<Register setActivePage={setActivePage} />} />
-              <Route path="/dashboard" element={<Dashboard setActivePage={setActivePage} />} />
+              
               
               {/* Academic feature routes */}
               <Route path="/smart-notes" element={<div>Smart Notes Maker Page</div>} />

@@ -12,7 +12,7 @@
 
 /* Column 1 - Fixed Mode Selection */
 .navbar-column-1 {
-  width: 125px; /* Reduced width */
+  width: 75px; /* Reduced width */
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   display: flex;
   flex-direction: column;
@@ -26,7 +26,7 @@
   flex-direction: column;
   gap: 16px; /* More space between buttons */
   padding: 0 15px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .mode-button {
@@ -34,7 +34,7 @@
   flex-direction: column; /* Stack icon above text */
   align-items: center;
   justify-content: center;
-  padding: 16px 8px;
+  /* padding: 16px 8px; */
   border: none;
   background: #f8fafc;
   border-radius: 12px;
@@ -71,7 +71,7 @@
 /* Remove mode-button-content wrapper since we're using flex-direction: column */
 .mode-icon {
   font-size: 28px; /* Larger icon */
-  margin-bottom: 8px; /* Space between icon and label */
+  margin-bottom: 2px; /* Space between icon and label */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,11 +83,13 @@
 }
 
 .mode-label {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  /* font-weight: 600; */
   text-align: center;
   line-height: 1.2;
   white-space: nowrap;
+  padding-left: 2px;
 }
 
 /* Common Items in Column 1 - Also vertical */

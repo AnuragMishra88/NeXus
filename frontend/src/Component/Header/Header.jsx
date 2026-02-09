@@ -1,5 +1,7 @@
 import './Header.css';
 import { useNavigate } from 'react-router-dom';
+import nexus_logo from '../../assets/nexus.png';
+import logo from '../../assets/logo.png';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -7,11 +9,12 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
-        <h1 className="logo" onClick={() => navigate('/')}>
-          <span className="logo-accent">NEXUS</span>
+        
+        <h1 onClick={() => navigate('/')}>
+          <span className="logo-accent"><img src={nexus_logo} alt="logo" height={150}  width={190} style={{marginTop:10}}/></span>
         </h1>
-       
-      </div>
+       </div>
+      
       <div className="header-right">
         <button className="auth-btn secondary" onClick={() => navigate('/signin')}>
           Sign In

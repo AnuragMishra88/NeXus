@@ -1,26 +1,58 @@
-/* Smaller Modal Container */
+/* Auth.css - Compact SignIn Modal */
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 20px;
+}
+
+.modal-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Compact Modal Container */
 .modal-container {
   background: white;
   border-radius: 16px;
   width: 95%;
-  max-width: 420px; /* Reduced from 500px */
-  max-height: 85vh; /* Reduced from 90vh */
+   /* Reduced from 500px */ 
+  max-height: 90vh;
   overflow-y: auto;
   transform: scale(0.9);
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4); /* Lighter shadow */
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
   position: relative;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  border: 1px solid rgba(229, 231, 235, 0.5);
 }
 
-/* Smaller Modal Header */
+.modal-container.visible {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Modal Header - Compact */
 .modal-header {
   position: sticky;
   top: 0;
   background: white;
-  padding: 20px 25px; /* Reduced padding */
+  padding: 20px 24px; /* Reduced padding */
   border-bottom: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
@@ -30,193 +62,474 @@
 }
 
 .modal-header h2 {
-  font-size: 1.5rem; /* Reduced from 1.8rem */
-  font-weight: 800;
+  font-size: 1.4rem; /* Reduced from 1.8rem */
+  font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
-/* Smaller Close Button */
 .close-btn {
-  background: #f1f5f9;
+  background: #f8fafc;
   border: none;
-  width: 35px; /* Reduced from 40px */
-  height: 35px; /* Reduced from 40px */
-  border-radius: 50%;
+  width: 32px; /* Reduced */
+  height: 32px; /* Reduced */
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: #64748b;
-  font-size: 16px; /* Reduced from 18px */
-  transition: all 0.3s ease;
+  font-size: 14px; /* Reduced */
+  transition: all 0.2s ease;
 }
 
-/* Compact Login Card */
+.close-btn:hover {
+  background: #ef4444;
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* Login Card - Compact */
 .login-card {
-  padding: 20px 25px 25px; /* Reduced padding */
+  padding: 0 24px 24px; /* Reduced padding */
+  animation: fadeIn 0.4s ease;
 }
 
-.login-header {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Welcome Header - Compact */
+.welcome-header {
   text-align: center;
-  margin-bottom: 20px; /* Reduced from 30px */
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.login-header p {
-  color: #64748b;
-  font-size: 14px; /* Reduced from 16px */
+.welcome-header h3 {
+  font-size: 1.1rem; /* Reduced */
+  color: #1f2937;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 
-/* Compact Form Groups */
+.welcome-header p {
+  color: #6b7280;
+  font-size: 13px; /* Reduced */
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Form Layout */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Reduced gap */
+}
+
+/* Form Groups - Compact */
 .form-group {
-  margin-bottom: 15px; /* Reduced from default */
+  margin-bottom: 0;
 }
 
 .form-group label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: #334155;
-  margin-bottom: 6px; /* Reduced from 8px */
-  font-size: 13px; /* Reduced from 14px */
+  gap: 6px; /* Reduced */
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+  font-size: 13px; /* Reduced */
 }
 
 .input-icon {
-  font-size: 13px; /* Reduced from 14px */
+  color: #667eea;
+  font-size: 12px; /* Reduced */
 }
 
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 10px 14px; /* Reduced from 12px 16px */
-  border: 2px solid #e2e8f0;
-  border-radius: 8px; /* Reduced from 10px */
-  font-size: 14px; /* Reduced from 15px */
-  transition: all 0.3s ease;
-  background: white;
-  color: #334155;
+/* Password Input Container - Compact */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-/* Compact Password Toggle */
+.password-input-container input {
+  flex: 1;
+  padding-right: 40px; /* Adjusted */
+}
+
 .password-toggle {
   position: absolute;
-  right: 12px; /* Reduced from 15px */
-  top: 50%;
-  transform: translateY(-50%);
+  right: 10px;
   background: none;
   border: none;
-  color: #64748b;
+  color: #9ca3af;
   cursor: pointer;
-  font-size: 14px; /* Reduced from 16px */
-  padding: 4px; /* Reduced from 5px */
+  font-size: 14px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
 }
 
-/* Compact Login Options */
+.password-toggle:hover {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+/* Input Fields - Compact */
+.form-group input {
+  width: 100%;
+  padding: 10px 12px; /* Reduced padding */
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: white;
+  color: #111827;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input.error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+/* Error Messages - Compact */
+.error-message {
+  display: block;
+  color: #dc2626;
+  font-size: 11px; /* Reduced */
+  margin-top: 4px;
+  font-weight: 500;
+  min-height: 16px;
+}
+
+/* Login Options - Compact */
 .login-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 15px 0 20px; /* Reduced margins */
+  margin-top: 4px;
+  padding: 0 2px;
 }
 
+/* Checkbox Styling - Compact */
 .checkbox-container {
-  font-size: 13px; /* Reduced from 14px */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 13px; /* Reduced */
+  color: #6b7280;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
 }
 
 .checkmark {
-  width: 16px; /* Reduced from 18px */
-  height: 16px; /* Reduced from 18px */
-  margin-right: 8px; /* Reduced from 10px */
+  position: relative;
+  height: 18px; /* Reduced */
+  width: 18px; /* Reduced */
+  background-color: #fff;
+  border: 1.5px solid #d1d5db;
+  border-radius: 4px;
+  margin-right: 8px;
+  transition: all 0.2s ease;
 }
 
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #667eea;
+  border-color: #667eea;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-container:hover .checkmark {
+  border-color: #9ca3af;
+}
+
+/* Forgot Password - Compact */
 .forgot-password {
-  font-size: 13px; /* Reduced from 14px */
+  font-size: 13px; /* Reduced */
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-/* Compact Login Button */
+.forgot-password:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* Login Button - Compact */
 .login-btn {
   width: 100%;
-  padding: 14px; /* Reduced from 16px */
-  border-radius: 8px; /* Reduced from 10px */
-  font-size: 15px; /* Reduced from 16px */
-  margin-bottom: 20px; /* Reduced from 25px */
+  padding: 11px 16px; /* Reduced */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px; /* Reduced */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
-/* Compact Divider */
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+}
+
+.login-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Divider - Compact */
 .divider {
-  margin: 20px 0; /* Reduced from 25px 0 */
-  font-size: 13px; /* Reduced from 14px */
+  display: flex;
+  align-items: center;
+  margin: 16px 0; /* Reduced */
+  color: #6b7280;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
 }
 
 .divider span {
-  padding: 0 12px; /* Reduced from 0 15px */
+  padding: 0 12px; /* Reduced */
+  font-size: 12px; /* Reduced */
+  color: #9ca3af;
+  font-weight: 500;
 }
 
-/* Compact Social Login */
+/* Social Login - Compact */
 .social-login {
-  gap: 12px; /* Reduced from 15px */
-  margin-bottom: 20px; /* Reduced from 25px */
+  display: flex;
+  gap: 12px; /* Reduced */
+  margin-bottom: 20px; /* Reduced */
 }
 
 .social-btn {
-  padding: 12px; /* Reduced from 14px */
-  font-size: 14px; /* Reduced from 15px */
-  gap: 8px; /* Reduced from 10px */
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Reduced */
+  padding: 10px 12px; /* Reduced */
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 13px; /* Reduced */
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.social-btn img {
-  width: 16px; /* Reduced from 18px */
-  height: 16px; /* Reduced from 18px */
+.social-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #d1d5db;
 }
 
-/* Compact Sign Up Link */
+.social-btn.google {
+  border-color: #e5e7eb;
+}
+
+.social-btn.google:hover {
+  background: #f9fafb;
+}
+
+.social-btn.github {
+  border-color: #e5e7eb;
+}
+
+.social-btn.github:hover {
+  background: #f9fafb;
+}
+
+.social-btn svg {
+  width: 16px; /* Reduced */
+  height: 16px; /* Reduced */
+}
+
+/* Sign Up Link - Compact */
 .signup-link {
-  font-size: 14px; /* Reduced from 15px */
-  padding-top: 15px; /* Reduced from 20px */
+  text-align: center;
+  margin-top: 16px; /* Reduced */
+  color: #6b7280;
+  font-size: 13px; /* Reduced */
+  padding-top: 16px; /* Reduced */
+  border-top: 1px solid #f3f4f6;
 }
 
-/* Error messages smaller */
-.error-message {
-  font-size: 11px; /* Reduced from 12px */
-  margin-top: 4px; /* Reduced from 5px */
+.signup-link a {
+  color: #667eea;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-/* Mobile responsiveness for smaller modal */
-@media (max-width: 480px) {
+.signup-link a:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* Spinner for loading state */
+.login-btn .spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.6s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Custom Scrollbar */
+.modal-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.modal-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.modal-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .modal-container {
-    max-width: 95%;
-    max-height: 90vh;
-    margin: 10px;
+    max-width: 340px; /* Even smaller on mobile */
   }
   
   .modal-header {
-    padding: 15px 20px;
+    padding: 16px 20px;
   }
   
   .modal-header h2 {
-    font-size: 1.3rem;
-  }
-  
-  .close-btn {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
+    font-size: 1.2rem;
   }
   
   .login-card {
-    padding: 15px 20px 20px;
+    padding: 0 20px 20px;
   }
   
-  .login-header p {
-    font-size: 13px;
+  .welcome-header h3 {
+    font-size: 1rem;
   }
   
-  .form-group input,
-  .form-group select {
+  .welcome-header p {
+    font-size: 12px;
+  }
+  
+  .form-group input {
     padding: 9px 12px;
     font-size: 13px;
+  }
+  
+  .login-btn {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+  
+  .modal-container {
+    max-width: 95%;
+    max-height: 85vh;
+    margin: 5px;
+  }
+  
+  .modal-header {
+    padding: 14px 16px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .login-card {
+    padding: 0 16px 16px;
+  }
+  
+  .social-login {
+    flex-direction: column;
+  }
+  
+  .close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
 }

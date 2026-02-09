@@ -10,6 +10,9 @@ import {
 } from 'react-icons/fa';
 import { useState } from 'react';
 
+import academic_logo from '../../assets/academic.png'
+import career_logo from '../../assets/career.png'
+
 const Navbar = ({ activePage, setActivePage, isExpanded, setIsExpanded, userMode = 'Academic' }) => {
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState(userMode);
@@ -17,8 +20,8 @@ const Navbar = ({ activePage, setActivePage, isExpanded, setIsExpanded, userMode
   
   // Mode configuration for Column 1
   const modes = [
-    { id: 'Academic', icon: '📚', label: 'Academic', color: '#3b82f6' },
-    { id: 'Career', icon: '💼', label: 'Career', color: '#10b981' },
+    { id: 'Academic', icon: <img src={academic_logo} alt="Academic" className="mode-img" height={40} width={50}/>, label: 'Academic', color: '#3b82f6' },
+    { id: 'Career', icon: <img src={career_logo} alt="Academic" className="mode-img" height={40} width={50}/>, label: 'Career', color: '#10b981' },
   ];
 
   // Navigation items for each mode (Column 2)
@@ -75,22 +78,22 @@ const Navbar = ({ activePage, setActivePage, isExpanded, setIsExpanded, userMode
       <div className="navbar-column-1">
         
         
-        {/* Mode Selection Buttons */}
-        <div className="mode-selection ">
-          {modes.map(mode => (
-            <button
-              key={mode.id}
-              className={`mode-button ${selectedMode === mode.id ? 'active' : ''}`}
-              onClick={() => handleModeSelect(mode.id)}
-              style={{ '--mode-color': mode.color }}
-            >
-              <div className="mode-button-content">
-                <span className="mode-icon ">{mode.icon}</span>
-                <span className="mode-label">{mode.label}</span>
-              </div>
-            </button>
-          ))}
-        </div>
+       <div className="mode-selection">
+  {modes.map(mode => (
+    <div key={mode.id} className="mode-wrapper">
+      <button
+        className={`mode-button ${selectedMode === mode.id ? 'active' : ''}`}
+        onClick={() => handleModeSelect(mode.id)}
+        style={{ '--mode-color': mode.color }}
+      >
+        <span className="mode-icon">{mode.icon}</span>
+      </button>
+
+      <span className="mode-label">{mode.label}</span>
+    </div>
+  ))}
+</div>
+
 
         {/* Common Items at Bottom of Column 1 */}
         <div className="column-1-bottom">

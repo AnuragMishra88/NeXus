@@ -416,6 +416,7 @@
   padding: 14px 28px;
   border: none;
   border-radius: 10px;
+  margin-left: 120px;
   font-weight: 700;
   font-size: 15px;
   cursor: pointer;
@@ -424,7 +425,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: 100%;
+  width: 70%;
 }
 
 .next-btn {

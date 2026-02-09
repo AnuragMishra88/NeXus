@@ -102,7 +102,7 @@ const SignIn = ({ setActivePage }) => {
     <div className={`modal-overlay ${isVisible ? 'visible' : ''}`} onClick={handleCloseModal}>
       <div 
         ref={modalRef}
-        className={`modal-container ${isVisible ? 'visible' : ''} ${isScrolling ? 'scrolling' : ''}`}
+        className={`modal-container ${isVisible ? 'visible' : ''} ${isScrolling ? 'scrolling' : ''}`} style={{maxWidth: 410}}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
@@ -113,13 +113,10 @@ const SignIn = ({ setActivePage }) => {
         </div>
 
         <div className="login-card">
-          <div className="login-header">
-            <p>Sign in to access your personalized dashboard</p>
-          </div>
-
+          
           <form onSubmit={handleSubmit}>
             {/* Email Field */}
-            <div className="form-group">
+            <div className="form-group" style={{paddingTop:20}}>
               <label htmlFor="email">
                 <FaEnvelope className="input-icon" />
                 Email Address *
@@ -138,7 +135,7 @@ const SignIn = ({ setActivePage }) => {
             </div>
 
             {/* Password Field */}
-            <div className="form-group">
+            <div className="form-group" style={{paddingTop:20}}>
               <label htmlFor="password">
                 <FaLock className="input-icon" />
                 Password *
@@ -165,7 +162,7 @@ const SignIn = ({ setActivePage }) => {
             </div>
 
             {/* Remember Me & Forgot Password */}
-            <div className="login-options">
+            <div className="login-options" style={{paddingTop:10}}>
               <label className="checkbox-container">
                 <input
                   type="checkbox"
@@ -199,11 +196,11 @@ const SignIn = ({ setActivePage }) => {
             <div className="social-login">
               <button type="button" className="social-btn google">
                 <img src="/google-icon.svg" alt="Google" />
-                Google
+                
               </button>
               <button type="button" className="social-btn github">
                 <img src="/github-icon.svg" alt="GitHub" />
-                GitHub
+                
               </button>
             </div>
 
