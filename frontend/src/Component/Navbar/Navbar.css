@@ -1,0 +1,461 @@
+.navbar-container {
+  position: fixed;
+  left: 0;
+  top: 60px;
+  height: calc(100vh - 60px);
+  display: flex;
+  z-index: 100;
+  background: white;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.08);
+  border-right: 1px solid #e2e8f0;
+}
+
+/* Column 1 - Fixed Mode Selection */
+.navbar-column-1 {
+  width: 125px; /* Reduced width */
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e2e8f0;
+  padding: 20px 0;
+}
+
+/* Mode Selection in Column 1 - VERTICAL ICON ABOVE TEXT */
+.mode-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* More space between buttons */
+  padding: 0 15px;
+  margin-bottom: 20px;
+}
+
+.mode-button {
+  display: flex;
+  flex-direction: column; /* Stack icon above text */
+  align-items: center;
+  justify-content: center;
+  padding: 16px 8px;
+  border: none;
+  background: #f8fafc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  min-height: 80px; /* Taller for vertical layout */
+}
+
+.mode-button:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px); /* Changed from translateX to translateY */
+}
+
+.mode-button.active {
+  background: linear-gradient(135deg, var(--mode-color) 0%, color-mix(in srgb, var(--mode-color) 70%, black) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.mode-button.active::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: white;
+  border-radius: 4px 0 0 4px;
+}
+
+/* Remove mode-button-content wrapper since we're using flex-direction: column */
+.mode-icon {
+  font-size: 28px; /* Larger icon */
+  margin-bottom: 8px; /* Space between icon and label */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.mode-button:hover .mode-icon {
+  transform: scale(1.1);
+}
+
+.mode-label {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Common Items in Column 1 - Also vertical */
+.column-1-bottom {
+  margin-top: auto;
+  padding: 20px 15px 0 15px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* More space between items */
+}
+
+.column-1-bottom .nav-item {
+  display: flex;
+  flex-direction: column; /* Stack icon above text */
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  color: #64748b;
+  min-height: 60px; /* Taller for vertical layout */
+}
+
+.column-1-bottom .nav-item:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.column-1-bottom .nav-item.active {
+  background: #f1f5f9;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+/* Remove nav-item-content wrapper */
+.column-1-bottom .nav-icon {
+  font-size: 20px; /* Larger icon */
+  margin-bottom: 6px; /* Space between icon and label */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.column-1-bottom .nav-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.column-1-bottom .logout {
+  margin-top: 10px;
+  color: #ef4444;
+}
+
+.column-1-bottom .logout:hover {
+  background: #fee2e2;
+}
+
+/* Column 2 - Dynamic Navigation */
+.navbar-column-2 {
+  width: 60px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.navbar-column-2.hovered {
+  width: 200px;
+  box-shadow: 5px 0 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Column 2 Header */
+.column-2-header {
+  padding: 20px 0;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.current-mode-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  min-height: 40px;
+}
+
+.current-mode-icon {
+  font-size: 24px;
+  min-width: 24px;
+}
+
+.current-mode-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* Column 2 Navigation Items */
+.column-2-navigation {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 10px;
+  overflow-y: auto;
+  max-height: calc(100vh - 240px);
+}
+
+/* Hide scrollbar */
+.column-2-navigation::-webkit-scrollbar {
+  width: 4px;
+}
+
+.column-2-navigation::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.column-2-navigation::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.column-2-navigation::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.column-2-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  min-height: 44px;
+}
+
+.column-2-item:hover {
+  background: #f1f5f9;
+  transform: translateX(5px);
+}
+
+.column-2-item.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.column-2-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: white;
+  border-radius: 0 2px 2px 0;
+}
+
+.item-icon {
+  font-size: 18px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.3s ease;
+}
+
+.column-2-item.active .item-icon {
+  color: white;
+  transform: scale(1.1);
+}
+
+.column-2-item:hover .item-icon {
+  transform: scale(1.1);
+}
+
+.item-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+  flex: 1;
+  text-align: left;
+}
+
+.navbar-column-2.hovered .item-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.column-2-item.active .item-label {
+  color: white;
+  font-weight: 600;
+}
+
+.item-badge {
+  margin-left: auto;
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.navbar-column-2.hovered .item-badge {
+  opacity: 1;
+}
+
+/* Column 2 Footer */
+.column-2-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #e2e8f0;
+  margin-top: auto;
+}
+
+.mode-indicator {
+  font-size: 12px;
+  color: #64748b;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .navbar-container {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    position: relative;
+    top: 0;
+  }
+  
+  .navbar-column-1 {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .mode-selection {
+    flex-direction: row;
+    margin-bottom: 0;
+    gap: 10px;
+  }
+  
+  .mode-button {
+    min-width: 100px;
+    min-height: 70px;
+  }
+  
+  .column-1-bottom {
+    flex-direction: row;
+    border-top: none;
+    padding-top: 10px;
+    margin-top: 0;
+    gap: 10px;
+  }
+  
+  .navbar-column-2 {
+    width: 100%;
+    height: 300px;
+  }
+  
+  .navbar-column-2.hovered {
+    width: 100%;
+  }
+  
+  .column-2-navigation {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    max-height: none;
+  }
+  
+  .column-2-item {
+    flex: 0 0 calc(50% - 4px);
+    justify-content: center;
+  }
+  
+  .item-label {
+    display: none;
+  }
+  
+  .navbar-column-2.hovered .column-2-item {
+    justify-content: flex-start;
+  }
+  
+  .navbar-column-2.hovered .item-label {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    display: none;
+  }
+}
+
+/* Add these styles to your existing Navbar.css */
+
+/* Column 2 Header Enhancements */
+.current-mode-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 400;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Badge styling in Column 1 */
+.nav-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* Mode stats in footer */
+.mode-stats {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 4px;
+  font-weight: 400;
+}
