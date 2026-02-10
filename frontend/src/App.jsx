@@ -4,6 +4,7 @@ import Header from './Component/Header/Header';
 import Navbar from './Component/Navbar/Navbar';
 import Homepage from './Pages/Homepage/Homepage';
 import SignIn from './Pages/Homepage/Auth/SignIn';
+import SmartNotes from './Component/Academic/SmartNotes'; // Add this import
 import Register from './Pages/Homepage/Auth/Register';
 
 import './App.css';
@@ -74,7 +75,7 @@ function App() {
               
               
               {/* Academic feature routes */}
-              <Route path="/smart-notes" element={<div>Smart Notes Maker Page</div>} />
+              <Route path="/smart-notes" element={<SmartNotes setActivePage={setActivePage} />} />
               <Route path="/assignment-helper" element={<div>Assignment Helper Page</div>} />
               <Route path="/exam-prep" element={<div>Exam Prep Buddy Page</div>} />
               <Route path="/doubt-solver" element={<div>Doubt Solver Page</div>} />

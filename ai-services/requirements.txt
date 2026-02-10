@@ -1,0 +1,10 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+langchain==0.0.339
+langchain-community==0.0.13
+langchain-huggingface==0.0.3
+python-dotenv==1.0.0
+pydantic==2.5.0
+pypdf==3.17.0
+langsmith==0.0.85  # ADD THIS LINE
+huggingface-hub>=0.19.4  # ADD THIS LINE
