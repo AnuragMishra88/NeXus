@@ -4,121 +4,81 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
 
+
 export const register = async (req, res) => {
     try {
-        const { fullName, email, phoneNumber, password } = req.body;
-         
-        // Check only basic required fields
-        if (!fullName || !email || !phoneNumber || !password) {
-            return res.status(400).json({
-                message: "Full name, email, phone number and password are required",
-                success: false
-            });
-        };
+        const { 
+            fullName, email, phoneNumber, password,
+            collegeName, degree, specialization, graduationYear,
+            cgpa, tenthPercentage, twelfthPercentage, skills,
+            linkedinProfile, location, experienceLevel, jobType, preferredRole
+        } = req.body;
 
-        // Check if user already exists
-        const existingUser = await User.findOne({ email: email.toLowerCase() });
-        if (existingUser) {
-            return res.status(400).json({
-                message: 'User already exists with this email',
-                success: false,
-            });
+        // 1. Check Mandatory Fields
+        if (!fullName || !email || !phoneNumber || !password) {
+            return res.status(400).json({ message: "Mandatory fields missing", success: false });
         }
 
-        // Hash password
+        // 2. Check if user exists
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        if (existingUser) return res.status(400).json({ message: 'User already exists', success: false });
+
+        // 3. Handle Resume File Upload (If provided during registration)
+        const file = req.file;
+        let resumeUrl = "";
+        let resumeOriginalName = "";
+
+        if (file) {
+            const fileUri = getDataUri(file);
+            const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                resource_type: 'raw',
+                public_id: `resumes/${Date.now()}_${file.originalname.replace('.pdf', '')}`,
+                format: 'pdf'
+            });
+            resumeUrl = cloudResponse.secure_url;
+            resumeOriginalName = file.originalname;
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create user with ALL required fields
+        // 4. Create User with all fields + resumeUrl
         const user = await User.create({
             fullName: fullName.trim(),
             email: email.toLowerCase().trim(),
-            phoneNumber: phoneNumber.toString().trim(),
+            phoneNumber: phoneNumber.trim(),
             password: hashedPassword,
-            
-            // Account fields
-            role: 'student',
-            
-            // Education fields (required in model)
-            collegeUniversity: "Not provided yet",  // NON-EMPTY STRING
-            degreeProgram: "Other",
-            graduationYear: 2026,
-            tenthPercentage: 0,
-            twelfthPercentage: 0,
-            
-            // Career fields
-            resumeUrl: "",
-            
-            // Optional fields with defaults
-            linkedInProfile: "",
-            specialization: "",
-            currentSemester: "",
-            currentCGPA: null,
-            activeBacklogs: "",
-            skills: [],
-            preferredRole: "",
-            preferredLocation: "",
-            experienceLevel: "",
-            jobType: "",
-            profilePhoto: "",
-            bio: "",
-            isVerified: false,
-            isProfileComplete: false,
-            accountStatus: "active"
+            collegeUniversity: collegeName || "Not provided",
+            degreeProgram: degree || "Other",
+            specialization: specialization || "",
+            graduationYear: Number(graduationYear) || 2026,
+            currentCGPA: Number(cgpa) || 0,
+            tenthPercentage: Number(tenthPercentage) || 0,
+            twelfthPercentage: Number(twelfthPercentage) || 0,
+            linkedInProfile: linkedinProfile || "",
+            preferredLocation: location || "",
+            experienceLevel: experienceLevel || "Fresher",
+            jobType: jobType || "Full-time",
+            preferredRole: preferredRole || "",
+            skills: skills ? skills.split(",") : [],
+            resumeUrl: resumeUrl, // SAVING THE CLOUDINARY URL HERE
+            resumeOriginalName: resumeOriginalName
         });
 
-        // Create JWT token
-        const tokenData = {
-            userId: user._id,
-            email: user.email,
-            role: user.role
-        };
-        const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
-
-        // Prepare user response (without sensitive data)
-        const userResponse = {
-            _id: user._id,
-            fullName: user.fullName,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            role: user.role,
-            collegeUniversity: user.collegeUniversity
-        };
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
 
         return res.status(201).cookie("token", token, { 
-            maxAge: 1 * 24 * 60 * 60 * 1000, 
-            httpOnly: true, 
-            sameSite: 'strict' 
+            maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'strict' 
         }).json({
             message: "Account created successfully",
-            user: userResponse,
+            user: { _id: user._id, fullName: user.fullName },
             success: true
         });
+
     } catch (error) {
-        console.log("🔥 REGISTER ERROR:", error.message);
-        
-        // Handle specific error types
-        if (error.name === 'ValidationError') {
-            const errors = Object.values(error.errors).map(err => err.message);
-            return res.status(400).json({
-                message: "Validation failed",
-                errors: errors,
-                success: false
-            });
-        }
-        
-        if (error.code === 11000) {
-            return res.status(400).json({
-                message: "Email already exists",
-                success: false
-            });
-        }
-        
-        return res.status(500).json({
-            message: "Registration failed: " + error.message,
-            success: false
-        });
+        console.error("🔥 REGISTER ERROR:", error);
+        return res.status(500).json({ message: "Server Error: " + error.message, success: false });
     }
-}
+};
 
 export const login = async (req, res) => {
     try {

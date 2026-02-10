@@ -36,7 +36,8 @@ const handleMulterError = (error, req, res, next) => {
 };
 
 // =========== PUBLIC ROUTES ===========
-router.route("/register").post(register);
+// Add singleUpload to the register route
+router.route("/register").post(singleUpload, handleMulterError, register);
 router.route("/login").post(login);
 router.route("/logout").get(logout);
 

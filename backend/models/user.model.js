@@ -1,144 +1,37 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    // ACCOUNT SECTION
-    fullName: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    phoneNumber: {
-        type: String,
-        required: true
-    },
-    linkedInProfile: {
-        type: String,
-        default: ""
-    },
+    // MANDATORY SECTION
+    fullName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
 
-    // EDUCATION SECTION - FIXED WITH DEFAULTS
-    collegeUniversity: {
-        type: String,
-        required: true,
-        default: "Not provided yet"  // ✅ DEFAULT
-    },
-    degreeProgram: {
-        type: String,
-        required: true,
-        enum: ['B.Tech', 'B.Sc', 'B.Com', 'BBA', 'B.A.', 'M.Tech', 'MBA', 'MCA', 'Other'],
-        default: 'Other'  // ✅ DEFAULT
-    },
-    specialization: {
-        type: String,
-        default: ""
-    },
-    graduationYear: {
-        type: Number,
-        required: true,
-        default: 2026  // ✅ DEFAULT
-    },
-    currentSemester: {
-        type: String,
-        default: ""
-    },
-    currentCGPA: {
-        type: Number,
-        default: null
-    },
-    tenthPercentage: {
-        type: Number,
-        required: true,
-        default: 0  // ✅ DEFAULT
-    },
-    twelfthPercentage: {
-        type: Number,
-        required: true,
-        default: 0  // ✅ DEFAULT
-    },
-    activeBacklogs: {
-        type: String,
-        default: ""
-    },
-
-    // CAREER SECTION
-    resumeUrl: {
-        type: String,
-        default: ""  // ✅ ALREADY FIXED
-    },
-    resumeOriginalName: {
-        type: String,
-        default: ""
-    },
-    skills: {
-        type: [String],
-        default: []
-    },
-    preferredRole: {
-        type: String,
-        default: ""
-    },
-    preferredLocation: {
-        type: String,
-        default: ""
-    },
-    experienceLevel: {
-        type: String,
-        default: ""
-    },
-    jobType: {
-        type: String,
-        default: ""
-    },
+    // OPTIONAL SECTION (Removed 'required: true' to prevent crashes)
+    linkedInProfile: { type: String, default: "" },
+    collegeUniversity: { type: String, default: "Not provided" },
+    degreeProgram: { type: String, default: "Other" },
+    specialization: { type: String, default: "" },
+    graduationYear: { type: Number, default: 2026 },
+    currentSemester: { type: String, default: "" },
+    currentCGPA: { type: Number, default: 0 },
+    tenthPercentage: { type: Number, default: 0 },
+    twelfthPercentage: { type: Number, default: 0 },
+    activeBacklogs: { type: String, default: "0" },
+    
+    // CAREER & SEARCH
+    skills: { type: [String], default: [] },
+    preferredRole: { type: String, default: "" },
+    preferredLocation: { type: String, default: "" },
+    experienceLevel: { type: String, default: "Fresher" },
+    jobType: { type: String, default: "Full-time" },
+    resumeUrl: { type: String, default: "" },
+    resumeOriginalName: { type: String, default: "" },
 
     // ACCOUNT MANAGEMENT
-    role: {
-        type: String,
-        enum: ['student', 'recruiter', 'admin'],
-        default: 'student'
-    },
-    profilePhoto: {
-        type: String,
-        default: ""
-    },
-    isVerified: {
-        type: Boolean,
-        default: false
-    },
-    isProfileComplete: {
-        type: Boolean,
-        default: false
-    },
-
-    // SOCIAL/PROFILE
-    bio: {
-        type: String,
-        default: ""
-    },
-    company: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Company',
-        default: null
-    },
-
-    // ACCOUNT STATUS
-    accountStatus: {
-        type: String,
-        enum: ['active', 'suspended', 'deactivated'],
-        default: 'active'
-    },
-    lastLogin: {
-        type: Date,
-        default: null
-    }
-
+    role: { type: String, enum: ['student', 'recruiter', 'admin'], default: 'student' },
+    profilePhoto: { type: String, default: "" },
+    accountStatus: { type: String, enum: ['active', 'suspended'], default: 'active' }
 }, { timestamps: true });
 
 export const User = mongoose.model('User', userSchema);

@@ -72,27 +72,40 @@ const Register = ({ setActivePage }) => {
     e.preventDefault();
     setSubmitError('');
     
-    try {
-      const payload = {
-        ...formData,
-        graduationYear: parseInt(formData.graduationYear),
-        currentCGPA: formData.cgpa ? parseFloat(formData.cgpa) : null,
-        tenthPercentage: formData.tenthPercentage ? parseFloat(formData.tenthPercentage) : 0,
-        twelfthPercentage: formData.twelfthPercentage ? parseFloat(formData.twelfthPercentage) : 0,
-        skills: formData.skills.join(",") // Convert array to comma-separated string
-      };
+    if (!validatePage1()) return;
 
-      await register(payload);
+    try {
+      // 1. Create FormData instead of a standard object
+      const formDataToSend = new FormData();
+      
+      // 2. Append all text fields
+      formDataToSend.append("fullName", formData.fullName);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("password", formData.password);
+      formDataToSend.append("phoneNumber", formData.phoneNumber);
+      formDataToSend.append("collegeName", formData.collegeName);
+      formDataToSend.append("degree", formData.degree);
+      formDataToSend.append("graduationYear", formData.graduationYear);
+      formDataToSend.append("cgpa", formData.cgpa);
+      formDataToSend.append("tenthPercentage", formData.tenthPercentage);
+      formDataToSend.append("twelfthPercentage", formData.twelfthPercentage);
+      formDataToSend.append("skills", formData.skills.join(","));
+      
+      // 3. Append the File (The key MUST be 'file' to match your middleware)
+      if (formData.resume) {
+        formDataToSend.append("file", formData.resume);
+      }
+
+      // 4. Send FormData to the register function
+      await register(formDataToSend);
+      
       setIsVisible(false);
-      setTimeout(() => {
-        setActivePage('home');
-        navigate('/');
-      }, 300);
+      setTimeout(() => { navigate('/'); }, 300);
       
     } catch (error) {
       setSubmitError(error.message || 'Registration failed');
     }
-  };
+};
 
   const handleInputChange = (e) => {
     const { name, value, type, files } = e.target;
