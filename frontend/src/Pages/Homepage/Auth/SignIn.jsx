@@ -2,20 +2,26 @@ import './Auth.css';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaTimes, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useAuth } from '../../../Api/AuthContext'; // 1. Import useAuth
 
 const SignIn = ({ setActivePage }) => {
   const navigate = useNavigate();
   const modalRef = useRef(null);
+  
+  // 2. Extract login, loading, and authError from Context
+  const { login, loading: authLoading, error: authError } = useAuth();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
   });
+  
   const [errors, setErrors] = useState({});
   const [isVisible, setIsVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [localError, setLocalError] = useState(''); // For specific UI feedback
 
   useEffect(() => {
     setIsVisible(true);
@@ -25,42 +31,14 @@ const SignIn = ({ setActivePage }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (modalRef.current) {
-        setIsScrolling(modalRef.current.scrollTop > 10);
-      }
-    };
-
-    const modalElement = modalRef.current;
-    if (modalElement) {
-      modalElement.addEventListener('scroll', handleScroll);
-      return () => modalElement.removeEventListener('scroll', handleScroll);
-    }
-  }, []);
-
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    
-    if (!formData.password) newErrors.password = 'Password is required';
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value
     });
-    
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: '' });
-    }
+    if (errors[name]) setErrors({ ...errors, [name]: '' });
+    if (localError) setLocalError('');
   };
 
   const handleCloseModal = () => {
@@ -71,38 +49,39 @@ const SignIn = ({ setActivePage }) => {
     }, 300);
   };
 
+  // 3. Updated handleSubmit for Backend Integration
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLocalError('');
     
-    if (validateForm()) {
-      setIsLoading(true);
+    const isValid = () => {
+      const newErrors = {};
+      if (!formData.email.trim()) newErrors.email = 'Email is required';
+      if (!formData.password) newErrors.password = 'Password is required';
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
+
+    if (isValid()) {
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log('Login successful:', formData);
+        // Call the login function from AuthContext
+        await login(formData.email, formData.password);
+        
+        // Success: Close modal (Context handles state and redirects)
         handleCloseModal();
-      } catch (error) {
-        alert('Login failed. Please check your credentials.');
-      } finally {
-        setIsLoading(false);
+      } catch (err) {
+        // Error: Display message from backend
+        setLocalError(err.message || 'Invalid email or password');
       }
     }
   };
-
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') handleCloseModal();
-    };
-    
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, []);
 
   return (
     <div className={`modal-overlay ${isVisible ? 'visible' : ''}`} onClick={handleCloseModal}>
       <div 
         ref={modalRef}
-        className={`modal-container ${isVisible ? 'visible' : ''} ${isScrolling ? 'scrolling' : ''}`} style={{maxWidth: 410}}
+        className={`modal-container ${isVisible ? 'visible' : ''}`} 
+        style={{maxWidth: 410}}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
@@ -112,18 +91,21 @@ const SignIn = ({ setActivePage }) => {
           </button>
         </div>
 
+        {/* 4. Display Backend Errors */}
+        {(localError || authError) && (
+          <div className="error-banner" style={{ margin: '10px 20px', padding: '10px', background: '#fee2e2', color: '#dc2626', borderRadius: '8px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <FaTimes /> <span>{localError || authError}</span>
+          </div>
+        )}
+
         <div className="login-card">
-          
           <form onSubmit={handleSubmit}>
-            {/* Email Field */}
             <div className="form-group" style={{paddingTop:20}}>
               <label htmlFor="email">
-                <FaEnvelope className="input-icon" />
-                Email Address *
+                <FaEnvelope className="input-icon" /> Email Address *
               </label>
               <input
                 type="email"
-                id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
@@ -134,16 +116,13 @@ const SignIn = ({ setActivePage }) => {
               {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
 
-            {/* Password Field */}
             <div className="form-group" style={{paddingTop:20}}>
               <label htmlFor="password">
-                <FaLock className="input-icon" />
-                Password *
+                <FaLock className="input-icon" /> Password *
               </label>
               <div className="password-input-container">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  id="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
@@ -161,50 +140,29 @@ const SignIn = ({ setActivePage }) => {
               {errors.password && <span className="error-message">{errors.password}</span>}
             </div>
 
-            {/* Remember Me & Forgot Password */}
             <div className="login-options" style={{paddingTop:10}}>
               <label className="checkbox-container">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleInputChange}
-                />
+                <input type="checkbox" name="rememberMe" checked={formData.rememberMe} onChange={handleInputChange} />
                 <span className="checkmark"></span>
                 Remember me
               </label>
-              <Link to="/forgot-password" className="forgot-password">
+              <Link to="/forgot-password" style={{ color: '#667eea', fontSize: '14px', textDecoration: 'none' }}>
                 Forgot Password?
               </Link>
             </div>
 
-            {/* Submit Button */}
-            <button 
-              type="submit" 
-              className="login-btn"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+            {/* 5. Update Button Loading State */}
+            <button type="submit" className="login-btn" disabled={authLoading}>
+              {authLoading ? 'Verifying...' : 'Sign In'}
             </button>
 
-            {/* Divider */}
-            <div className="divider">
-              <span>Or continue with</span>
-            </div>
+            <div className="divider"><span>Or continue with</span></div>
 
-            {/* Social Login */}
             <div className="social-login">
-              <button type="button" className="social-btn google">
-                <img src="/google-icon.svg" alt="Google" />
-                
-              </button>
-              <button type="button" className="social-btn github">
-                <img src="/github-icon.svg" alt="GitHub" />
-                
-              </button>
+              <button type="button" className="social-btn google"><img src="/google-icon.svg" alt="Google" /></button>
+              <button type="button" className="social-btn github"><img src="/github-icon.svg" alt="GitHub" /></button>
             </div>
 
-            {/* Sign Up Link */}
             <div className="signup-link">
               Don't have an account? <Link to="/register">Create Account</Link>
             </div>

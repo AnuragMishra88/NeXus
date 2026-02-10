@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+#Build outputs
+dist/
+dist-ssr/
+build/
+
+# Backend / Environment secrets (CRITICAL)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

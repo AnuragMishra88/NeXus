@@ -9,6 +9,7 @@ import notesRoute from "./routes/notes.route.js";
 
 import path from "path";
 dotenv.config({});
+// https://gemini.google.com/share/16899e747265
 
 const app = express();
 const __dirname = path.resolve();

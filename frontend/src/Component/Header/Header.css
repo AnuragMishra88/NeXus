@@ -1,3 +1,49 @@
+/* New User Section Styles */
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: 20px;
+  transition: background 0.3s ease;
+}
+
+.user-info:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.user-icon {
+  font-size: 24px;
+  color: #667eea;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #475569; /* Matches your secondary text color */
+  font-size: 14px;
+}
+
+.logout-btn {
+  min-width: 50px !important; /* Overriding the default button width */
+  width: 50px;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  font-size: 18px !important;
+  color: #64748b !important;
+}
+
+.logout-btn:hover {
+  color: white !important;
+  background: #ef4444 !important; /* Red for logout */
+}
+
 .header {
   height: 70px;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
