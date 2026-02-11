@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import connectDB from "./utils/db.js";
 import userRoute from "./routes/user.route.js";
 import notesRoute from "./routes/notes.route.js";
+import resumeRoutes from './routes/resume.route.js';
+
 
 
 import path from "path";
@@ -32,6 +34,7 @@ const PORT = process.env.PORT || 8000; // CHANGED THIS
 // api's
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/notes", notesRoute); // Add this line
+app.use('/api/v1/user/resume', resumeRoutes);
 
 
 // app.use(express.static(path.join(__dirname,"/frontend/dist")))

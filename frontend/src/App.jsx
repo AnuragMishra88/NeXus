@@ -8,6 +8,8 @@ import SignIn from './Pages/Homepage/Auth/SignIn';
 import Register from './Pages/Homepage/Auth/Register';
 import SmartNotes from './Component/Academic/SmartNotes'; 
 import Profile from './Pages/Profile';
+import ResumeAnalyzer from './Component/Career/ResumeAnalyzer';
+
 
 import './App.css';
 
@@ -58,7 +60,7 @@ function App() {
             <Route path="/progress-analytics" element={<div>Progress Analytics Page</div>} />
             
             {/* Career feature routes */}
-            <Route path="/resume-analyzer" element={<div>Resume Analyzer Page</div>} />
+<Route path="/resume-analyzer" element={<ResumeAnalyzer setActivePage={setActivePage} />} />
             <Route path="/roadmap" element={<div>Career Roadmap Page</div>} />
             <Route path="/qa-assistant" element={<div>Q&A Assistant Page</div>} />
             <Route path="/interview-simulator" element={<div>Interview Simulator Page</div>} />
