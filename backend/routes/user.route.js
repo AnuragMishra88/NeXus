@@ -11,6 +11,7 @@ import isAuthenticated from "../middlewares/isAuthenticated.js";
 import { singleUpload } from "../middlewares/mutler.js";
 import multer from "multer";
 
+
 const router = express.Router();
 
 // Error handling middleware for multer

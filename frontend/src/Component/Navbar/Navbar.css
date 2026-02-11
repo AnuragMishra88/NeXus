@@ -20,6 +20,24 @@
   padding: 20px 0;
 }
 
+/* Profile photo in navbar */
+.profile-photo-nav {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid hsl(0, 0%, 100%);
+  /* margin-right: 2px; */
+}
+
+
+
+/* .nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
+
 /* Mode Selection in Column 1 - VERTICAL ICON ABOVE TEXT */
 .mode-selection {
   display: flex;

@@ -7,6 +7,7 @@ import Homepage from './Pages/Homepage/Homepage';
 import SignIn from './Pages/Homepage/Auth/SignIn';
 import Register from './Pages/Homepage/Auth/Register';
 import SmartNotes from './Component/Academic/SmartNotes'; 
+import Profile from './Pages/Profile';
 
 import './App.css';
 
@@ -15,19 +16,7 @@ function App() {
   const [activePage, setActivePage] = useState('home');
   const [selectedMode, setSelectedMode] = useState('Academic');
 
-  // Sync mode based on URL path
-  useEffect(() => {
-    const path = window.location.pathname;
-    if (path.toLowerCase().includes('/career')) {
-      setSelectedMode('Career');
-      setActivePage('career-home');
-    } else {
-      setSelectedMode('Academic');
-      setActivePage('academic-home');
-    }
-  }, []);
-
-  // Teammate's loading logic to prevent white screen
+  // If still loading auth state, show loading
   if (loading) {
     return (
       <div className="loading-container" style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100vh'}}>
@@ -53,11 +42,14 @@ function App() {
             <Route path="/Academic" element={<Homepage setActivePage={setActivePage} selectedMode="Academic" />} />
             <Route path="/Career" element={<Homepage setActivePage={setActivePage} selectedMode="Career" />} />
             
-            {/* Auth routes - Redirect if already logged in (Teammate's logic) */}
+            {/* Auth routes */}
             <Route path="/signin" element={user ? <Navigate to="/" /> : <SignIn setActivePage={setActivePage} />} />
             <Route path="/register" element={user ? <Navigate to="/" /> : <Register setActivePage={setActivePage} />} />
             
-            {/* Academic feature routes (Your specific paths) */}
+            {/* Profile route - FIXED: Only accessible when logged in */}
+            <Route path="/profile" element={user ? <Profile setActivePage={setActivePage} /> : <Navigate to="/signin" />} />
+            
+            {/* Academic feature routes */}
             <Route path="/smart-notes" element={<SmartNotes setActivePage={setActivePage} />} />
             <Route path="/assignment-helper" element={<div>Assignment Helper Page</div>} />
             <Route path="/exam-prep" element={<div>Exam Prep Buddy Page</div>} />
@@ -65,7 +57,7 @@ function App() {
             <Route path="/study-scheduler" element={<div>Study Scheduler Page</div>} />
             <Route path="/progress-analytics" element={<div>Progress Analytics Page</div>} />
             
-            {/* Career feature routes (Your specific paths) */}
+            {/* Career feature routes */}
             <Route path="/resume-analyzer" element={<div>Resume Analyzer Page</div>} />
             <Route path="/roadmap" element={<div>Career Roadmap Page</div>} />
             <Route path="/qa-assistant" element={<div>Q&A Assistant Page</div>} />
@@ -73,13 +65,9 @@ function App() {
             <Route path="/coding-platforms" element={<div>Coding Platforms Page</div>} />
             <Route path="/portfolio-builder" element={<div>Portfolio Builder Page</div>} />
             
-            {/* Common protected routes (Merged logic) */}
-            <Route path="/profile" element={user ? <div>Profile Page</div> : <Navigate to="/signin" />} />
+            {/* Common routes */}
             <Route path="/settings" element={<div>Settings Page</div>} />
             <Route path="/logout" element={<div>Logout Page</div>} />
-            
-            {/* Fallback route */}
-            <Route path="*" element={<Homepage setActivePage={setActivePage} selectedMode={selectedMode} />} />
           </Routes>
         </div>
       </div>

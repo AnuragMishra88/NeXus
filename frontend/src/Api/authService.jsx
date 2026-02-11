@@ -57,17 +57,17 @@ export const authService = {
   /**
    * Upload Profile Photo Specifically
    */
-  uploadProfilePhoto: async (file) => {
-    const formData = new FormData();
-    formData.append('file', file); // 'file' matches your singleUpload middleware key
-    
-    try {
-      const response = await API.post('/profile/upload-photo', formData);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Upload failed' };
-    }
-  },
+  /**
+ * Upload Profile Photo Specifically
+ */
+uploadProfilePhoto: async (formData) => {  // Change parameter from 'file' to 'formData'
+  try {
+    const response = await API.post('/profile/upload-photo', formData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Upload failed' };
+  }
+},
 
   /**
    * Logout User
