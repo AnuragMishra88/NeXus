@@ -516,27 +516,30 @@ const Profile = () => {
                         PDF Document • {new Date().toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="resume-actions">
-                      <a 
-                        href={profile.resumeUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="resume-view-btn"
-                      >
-                        View
-                      </a>
-                      {isEditing && (
-                        <label className="resume-change-btn">
-                          {uploading ? '⏳' : 'Change'}
-                          <input
-                            type="file"
-                            accept=".pdf"
-                            onChange={handleUploadResume}
-                            disabled={uploading}
-                          />
-                        </label>
-                      )}
-                    </div>
+               <div className="resume-actions">
+  {/* Simple View button - opens PDF in new tab */}
+  <a 
+  href={profile.resumeUrl.replace('/upload/', '/upload/fl_attachment:NeXus_resume/')} 
+  download="NeXus_resume.pdf"
+  target="_blank" 
+  rel="noopener noreferrer"
+  className="resume-view-btn"
+>
+  View
+</a>
+  
+  {isEditing && (
+    <label className="resume-change-btn">
+      {uploading ? '⏳' : 'Change'}
+      <input
+        type="file"
+        accept=".pdf"
+        onChange={handleUploadResume}
+        disabled={uploading}
+      />
+    </label>
+  )}
+</div>
                   </div>
                 </div>
               ) : (
