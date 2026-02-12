@@ -27,6 +27,8 @@ import {
   FaEdit,
   FaClipboardCheck,
   FaUserGraduate,
+  FaInfoCircle,
+  FaQuestion,
 } from "react-icons/fa";
 import { useState } from "react";
 import { useAuth } from '../../Api/AuthContext';
@@ -44,7 +46,7 @@ const Navbar = ({
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState(userMode);
   const [isColumn2Hovered, setIsColumn2Hovered] = useState(false);
-  const { user } = useAuth(); // Add this line
+  const { user } = useAuth();
 
   // Mode configuration for Column 1
   const modes = [
@@ -111,7 +113,6 @@ const Navbar = ({
         label: "Study Scheduler",
         path: "/study-scheduler",
       },
-
       {
         id: "lecture-notes",
         icon: <FaBook />,
@@ -182,9 +183,20 @@ const Navbar = ({
       },
     ],
   };
+
   const goToProfile = () => {
-    setActivePage("profile"); // This tells App.js to switch focus
+    setActivePage("profile");
     navigate("/profile");
+  };
+
+  const goToFAQ = () => {
+    setActivePage("faq");
+    navigate("/faq");
+  };
+
+  const goToAboutUs = () => {
+    setActivePage("about");
+    navigate("/about");
   };
 
   // Common items for bottom section
@@ -220,7 +232,6 @@ const Navbar = ({
               >
                 <span className="mode-icon">{mode.icon}</span>
               </button>
-
               <span className="mode-label">{mode.label}</span>
             </div>
           ))}
@@ -228,6 +239,7 @@ const Navbar = ({
 
         {/* Common Items at Bottom of Column 1 */}
         <div className="column-1-bottom">
+          {/* Settings */}
           {commonItems.map((item) => (
             <button
               key={item.id}
@@ -241,22 +253,53 @@ const Navbar = ({
               </div>
             </button>
           ))}
-          <button className="nav-item" onClick={() => navigate("/profile")}>
-  <div className="nav-item-content">
-    {user?.profilePhoto ? (
-      <img 
-        src={user.profilePhoto} 
-        alt="Profile" 
-        className="profile-photo-nav"
-      />
-    ) : (
-      <span className="nav-icon">
-        <FaUserCircle />
-      </span>
-    )}
-    <span className="nav-label">Profile</span>
-  </div>
-</button>
+
+          {/* FAQ Button */}
+          <button
+            className={`nav-item ${activePage === "faq" ? "active" : ""}`}
+            onClick={goToFAQ}
+          >
+            <div className="nav-item-content">
+              <span className="nav-icon">
+                <FaQuestion />
+              </span>
+              <span className="nav-label">FAQ</span>
+            </div>
+          </button>
+
+          {/* About Us Button */}
+          <button
+            className={`nav-item ${activePage === "about" ? "active" : ""}`}
+            onClick={goToAboutUs}
+          >
+            <div className="nav-item-content">
+              <span className="nav-icon">
+                <FaInfoCircle />
+              </span>
+              <span className="nav-label">About Us</span>
+            </div>
+          </button>
+
+          {/* Profile Button */}
+          <button 
+            className={`nav-item ${activePage === "profile" ? "active" : ""}`} 
+            onClick={goToProfile}
+          >
+            <div className="nav-item-content">
+              {user?.profilePhoto ? (
+                <img 
+                  src={user.profilePhoto} 
+                  alt="Profile" 
+                  className="profile-photo-nav"
+                />
+              ) : (
+                <span className="nav-icon">
+                  <FaUserCircle />
+                </span>
+              )}
+              <span className="nav-label">Profile</span>
+            </div>
+          </button>
         </div>
       </div>
 

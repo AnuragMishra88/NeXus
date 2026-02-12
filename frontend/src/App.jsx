@@ -10,6 +10,9 @@ import SmartNotes from './Component/Academic/SmartNotes';
 import Profile from './Pages/Profile';
 import ResumeAnalyzer from './Component/Career/ResumeAnalyzer';
 
+// Import FAQ and About Us pages
+import FAQ from './Pages/Homepage/Faq'; // Adjust path as needed
+import AboutUs from './Pages/Homepage/Aboutus'; // Adjust path as needed
 
 import './App.css';
 
@@ -48,7 +51,7 @@ function App() {
             <Route path="/signin" element={user ? <Navigate to="/" /> : <SignIn setActivePage={setActivePage} />} />
             <Route path="/register" element={user ? <Navigate to="/" /> : <Register setActivePage={setActivePage} />} />
             
-            {/* Profile route - FIXED: Only accessible when logged in */}
+            {/* Profile route - Only accessible when logged in */}
             <Route path="/profile" element={user ? <Profile setActivePage={setActivePage} /> : <Navigate to="/signin" />} />
             
             {/* Academic feature routes */}
@@ -60,12 +63,16 @@ function App() {
             <Route path="/progress-analytics" element={<div>Progress Analytics Page</div>} />
             
             {/* Career feature routes */}
-<Route path="/resume-analyzer" element={<ResumeAnalyzer setActivePage={setActivePage} />} />
+            <Route path="/resume-analyzer" element={<ResumeAnalyzer setActivePage={setActivePage} />} />
             <Route path="/roadmap" element={<div>Career Roadmap Page</div>} />
             <Route path="/qa-assistant" element={<div>Q&A Assistant Page</div>} />
             <Route path="/interview-simulator" element={<div>Interview Simulator Page</div>} />
             <Route path="/coding-platforms" element={<div>Coding Platforms Page</div>} />
             <Route path="/portfolio-builder" element={<div>Portfolio Builder Page</div>} />
+            
+            {/* FAQ and About Us routes - Public routes accessible to everyone */}
+            <Route path="/faq" element={<FAQ setActivePage={setActivePage} />} />
+            <Route path="/about" element={<AboutUs setActivePage={setActivePage} />} />
             
             {/* Common routes */}
             <Route path="/settings" element={<div>Settings Page</div>} />
