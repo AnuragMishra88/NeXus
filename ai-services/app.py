@@ -1,8 +1,9 @@
-# app.py - COMPLETE INTEGRATED SERVICE (Existing functionality preserved)
+# app.py - COMPLETE INTEGRATED SERVICE (Existing functionality preserved + Quiz Bank)
 import os
 import tempfile
 import json
 import re
+import random
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -10,13 +11,14 @@ from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from typing import List, Optional
 import PyPDF2
 import docx
 
 load_dotenv()
 
 # ==================== FastAPI App ====================
-app = FastAPI(title="AI Text Summarizer (Groq)", version="1.1.0")  # Keep original title
+app = FastAPI(title="AI Text Summarizer (Groq)", version="1.2.0")  # Updated version
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,6 +42,34 @@ class ResumeAnalysisRequest(BaseModel):
 class RewriteRequest(BaseModel):
     bullet_point: str
     target_role: str = "Software Engineer"
+
+# NEW - Quiz Bank Models
+class QuizRequest(BaseModel):
+    topic: str
+    num_questions: int = 5
+    difficulty: str = "medium"
+
+class QuizQuestion(BaseModel):
+    question: str
+    options: List[str]
+    correct_answer: str
+    explanation: str
+
+class QuizResponse(BaseModel):
+    topic: str
+    questions: List[QuizQuestion]
+    total_questions: int
+
+class QuizSubmission(BaseModel):
+    questions: List[dict]
+    answers: List[str]
+
+class QuizResult(BaseModel):
+    score: int
+    total: int
+    percentage: float
+    correct_answers: List[str]
+    detailed_results: List[dict]
 
 # ==================== GROQ CONFIGURATION ====================
 GROQ_API_KEY = "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"
@@ -114,7 +144,7 @@ class GroqSummarizer:
             if tmp_path and os.path.exists(tmp_path):
                 os.unlink(tmp_path)
 
-# ==================== NEW RESUME ANALYZER - ADDED WITHOUT MODIFYING EXISTING ====================
+# ==================== RESUME ANALYZER - ADDED WITHOUT MODIFYING EXISTING ====================
 class ResumeAnalyzer:
     def __init__(self):
         try:
@@ -303,9 +333,139 @@ Improved version (one sentence only):""",
         except Exception:
             return bullet_point
 
+# ==================== NEW QUIZ BANK - ADDED WITHOUT MODIFYING EXISTING ====================
+class QuizBank:
+    def __init__(self):
+        try:
+            self.llm = ChatGroq(
+                groq_api_key=GROQ_API_KEY,
+                model_name="llama-3.1-8b-instant",
+                temperature=0.4,  # Slight creativity for variety
+                max_tokens=4000
+            )
+            print("✅ Groq Quiz Bank initialized successfully")
+        except Exception as e:
+            print(f"❌ Error initializing Groq Quiz Bank: {e}")
+            self.llm = None
+        
+        self.parser = StrOutputParser()
+        
+        self.quiz_prompt = PromptTemplate(
+            template="""You are an expert educator and quiz creator. Generate {num_questions} multiple-choice questions about: {topic}
+Difficulty level: {difficulty}
+
+Requirements:
+- Each question must have exactly 4 options (A, B, C, D)
+- Only ONE correct answer per question
+- Make distractors plausible but clearly incorrect
+- Include a brief explanation for the correct answer
+- Cover different aspects of the topic
+- Ensure questions are clear and unambiguous
+
+Return your response in this EXACT JSON format:
+{{
+  "questions": [
+    {{
+      "question": "Question text here?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correct_answer": "Option A (exact text of correct answer)",
+      "explanation": "Brief explanation why this is correct"
+    }}
+  ]
+}}
+
+Generate exactly {num_questions} questions.""",
+            input_variables=["topic", "num_questions", "difficulty"]
+        )
+    
+    def generate_quiz(self, topic: str, num_questions: int = 5, difficulty: str = "medium") -> dict:
+        """Generate quiz questions on a given topic"""
+        if self.llm is None:
+            return self.fallback_quiz(topic, num_questions)
+        
+        try:
+            # Validate inputs
+            num_questions = max(1, min(30, num_questions))  # Limit to 30 questions max
+            difficulty = difficulty if difficulty in ["easy", "medium", "hard"] else "medium"
+            
+            chain = self.quiz_prompt | self.llm | self.parser
+            result = chain.invoke({
+                "topic": topic,
+                "num_questions": num_questions,
+                "difficulty": difficulty
+            })
+            
+            # Extract JSON from response
+            json_match = re.search(r'\{.*\}', result, re.DOTALL)
+            if json_match:
+                quiz_data = json.loads(json_match.group())
+                # Ensure we have the right number of questions
+                if len(quiz_data.get("questions", [])) == num_questions:
+                    return quiz_data
+                else:
+                    # Adjust if we got wrong number
+                    quiz_data["questions"] = quiz_data.get("questions", [])[:num_questions]
+                    return quiz_data
+            else:
+                return self.fallback_quiz(topic, num_questions)
+            
+        except Exception as e:
+            print(f"Quiz generation error: {e}")
+            return self.fallback_quiz(topic, num_questions)
+    
+    def fallback_quiz(self, topic: str, num_questions: int) -> dict:
+        """Fallback quiz when LLM is unavailable"""
+        questions = []
+        for i in range(min(num_questions, 5)):  # Max 5 fallback questions
+            questions.append({
+                "question": f"Sample question about {topic} #{i+1}?",
+                "options": [
+                    f"Correct answer about {topic}",
+                    f"Incorrect option 1 for {topic}",
+                    f"Incorrect option 2 for {topic}",
+                    f"Incorrect option 3 for {topic}"
+                ],
+                "correct_answer": f"Correct answer about {topic}",
+                "explanation": f"This is the correct answer because it accurately describes {topic}."
+            })
+        return {"questions": questions}
+    
+    def evaluate_quiz(self, questions: List[dict], user_answers: List[str]) -> dict:
+        """Evaluate quiz answers and return score with details"""
+        score = 0
+        detailed_results = []
+        correct_answers = []
+        
+        for i, (q, user_ans) in enumerate(zip(questions, user_answers)):
+            is_correct = user_ans == q["correct_answer"]
+            if is_correct:
+                score += 1
+                correct_answers.append(user_ans)
+            
+            detailed_results.append({
+                "question_num": i + 1,
+                "question": q["question"],
+                "user_answer": user_ans,
+                "correct_answer": q["correct_answer"],
+                "is_correct": is_correct,
+                "explanation": q["explanation"]
+            })
+        
+        total = len(questions)
+        percentage = (score / total * 100) if total > 0 else 0
+        
+        return {
+            "score": score,
+            "total": total,
+            "percentage": round(percentage, 2),
+            "correct_answers": correct_answers,
+            "detailed_results": detailed_results
+        }
+
 # ==================== Initialize Services ====================
 summarizer = GroqSummarizer()  # EXISTING - DO NOT MODIFY
 resume_analyzer = ResumeAnalyzer()  # NEW - Added separately
+quiz_bank = QuizBank()  # NEW - Quiz Bank
 
 # ==================== FILE EXTRACTION UTILITIES ====================
 def extract_text_from_docx(docx_bytes: bytes) -> str:
@@ -363,26 +523,7 @@ async def summarize_pdf_endpoint(
         "filename": pdf.filename
     }
 
-# ==================== NEW ENDPOINTS - ADDED WITHOUT MODIFYING EXISTING ====================
-
-@app.get("/")
-def home():
-    return {
-        "service": "AI Text Summarizer (Groq)",
-        "version": "1.1.0",
-        "status": "running",
-        "summarizer_ready": summarizer.llm is not None,
-        "resume_analyzer_ready": resume_analyzer.llm is not None,
-        "available_endpoints": [
-            "/health",
-            "/summarize/text",
-            "/summarize/pdf",
-            "/analyze/text",
-            "/analyze/file",
-            "/rewrite",
-            "/skill-suggestions"
-        ]
-    }
+# ==================== NEW RESUME ANALYZER ENDPOINTS ====================
 
 @app.post("/analyze/text")
 async def analyze_resume_text(request: ResumeAnalysisRequest):
@@ -410,7 +551,7 @@ async def analyze_resume_file(
         raise HTTPException(400, "Empty file")
     
     if file_ext == 'pdf':
-        resume_text = summarizer.extract_pdf_text(content)  # Reuse existing PDF extractor
+        resume_text = summarizer.extract_pdf_text(content)
     else:
         resume_text = extract_text_from_docx(content)
     
@@ -481,22 +622,107 @@ async def get_skill_suggestions(role: str = "Software Engineer"):
         ]
     }
 
+# ==================== NEW QUIZ BANK ENDPOINTS ====================
+
+@app.post("/quiz/generate")
+async def generate_quiz(request: QuizRequest):
+    """Generate quiz questions on a topic (NEW)"""
+    if not request.topic.strip():
+        raise HTTPException(400, "Topic is required")
+    
+    # Validate question count
+    if request.num_questions not in [5, 10, 20, 30]:
+        request.num_questions = 5
+    
+    quiz_data = quiz_bank.generate_quiz(
+        topic=request.topic,
+        num_questions=request.num_questions,
+        difficulty=request.difficulty
+    )
+    
+    return {
+        "topic": request.topic,
+        "questions": quiz_data["questions"],
+        "total_questions": len(quiz_data["questions"])
+    }
+
+@app.post("/quiz/evaluate")
+async def evaluate_quiz(submission: QuizSubmission):
+    """Evaluate quiz answers and return score (NEW)"""
+    if not submission.questions or not submission.answers:
+        raise HTTPException(400, "Questions and answers are required")
+    
+    if len(submission.questions) != len(submission.answers):
+        raise HTTPException(400, "Number of questions and answers must match")
+    
+    result = quiz_bank.evaluate_quiz(submission.questions, submission.answers)
+    return result
+
+@app.get("/quiz/topics")
+async def get_suggested_topics():
+    """Get suggested quiz topics (NEW)"""
+    topics = [
+        "Python Programming",
+        "Machine Learning",
+        "Data Structures",
+        "Algorithms",
+        "Web Development",
+        "Database Systems",
+        "Cloud Computing",
+        "Cybersecurity",
+        "Artificial Intelligence",
+        "Software Engineering",
+        "React.js",
+        "Docker & Kubernetes",
+        "AWS Services",
+        "JavaScript",
+        "Java Programming"
+    ]
+    return {"suggested_topics": topics}
+
+@app.get("/")
+def home():
+    return {
+        "service": "AI Text Summarizer (Groq)",
+        "version": "1.2.0",
+        "status": "running",
+        "summarizer_ready": summarizer.llm is not None,
+        "resume_analyzer_ready": resume_analyzer.llm is not None,
+        "quiz_bank_ready": quiz_bank.llm is not None,
+        "available_endpoints": [
+            "/health",
+            "/summarize/text",
+            "/summarize/pdf",
+            "/analyze/text",
+            "/analyze/file",
+            "/rewrite",
+            "/skill-suggestions",
+            "/quiz/generate",
+            "/quiz/evaluate",
+            "/quiz/topics"
+        ]
+    }
+
 # ==================== Run Server ====================
 if __name__ == "__main__":
     import uvicorn
     print("\n" + "="*60)
-    print("🚀 Starting Groq-powered Summarizer on http://127.0.0.1:8001")
+    print("🚀 Starting Groq-powered Service on http://127.0.0.1:8001")
     print("✅ Existing summarizer endpoints preserved")
-    print("✅ New resume analyzer endpoints added")
+    print("✅ Resume analyzer endpoints preserved")
+    print("✅ NEW: Quiz Bank endpoints added")
     print("="*60)
     print("\n📋 Available Endpoints:")
     print("   [EXISTING] GET  /health")
     print("   [EXISTING] POST /summarize/text")
     print("   [EXISTING] POST /summarize/pdf")
-    print("   [NEW]      POST /analyze/text")
-    print("   [NEW]      POST /analyze/file")
-    print("   [NEW]      POST /rewrite")
-    print("   [NEW]      GET  /skill-suggestions")
+    print("   [EXISTING] POST /analyze/text")
+    print("   [EXISTING] POST /analyze/file")
+    print("   [EXISTING] POST /rewrite")
+    print("   [EXISTING] GET  /skill-suggestions")
+    print("   [NEW]      POST /quiz/generate")
+    print("   [NEW]      POST /quiz/evaluate")
+    print("   [NEW]      GET  /quiz/topics")
     print("="*60 + "\n")
     
     uvicorn.run(app, host="127.0.0.1", port=8001)

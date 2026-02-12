@@ -1,3 +1,4 @@
+// frontend/src/Component/Navbar/Navbar.jsx
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 import {
@@ -69,7 +70,7 @@ const Navbar = ({
       icon: (
         <img
           src={career_logo}
-          alt="Academic"
+          alt="Career"
           className="mode-img"
           height={40}
           width={50}
@@ -88,6 +89,12 @@ const Navbar = ({
         icon: <FaFileAlt />,
         label: "Smart Notes Maker",
         path: "/smart-notes",
+      },
+      {
+        id: "quiz-bank",
+        icon: <FaEdit />,
+        label: "Quiz Bank",
+        path: "/quiz-bank",
       },
       {
         id: "assignment-helper",
@@ -118,13 +125,7 @@ const Navbar = ({
         icon: <FaBook />,
         label: "Lecture Notes",
         path: "/lecture-notes",
-      },
-      {
-        id: "quiz-bank",
-        icon: <FaEdit />,
-        label: "Quiz Bank",
-        path: "/quiz-bank",
-      },
+      }
     ],
     Career: [
       {
@@ -132,6 +133,12 @@ const Navbar = ({
         icon: <FaFileContract />,
         label: "Resume Analyzer",
         path: "/resume-analyzer",
+      },
+      {
+        id: "skill-assessment",
+        icon: <FaCertificate />,
+        label: "Skill Assessment",
+        path: "/skill-assessment", // This will route to QuizBank
       },
       {
         id: "roadmap",
@@ -174,13 +181,7 @@ const Navbar = ({
         icon: <FaUserTie />,
         label: "Mock Interviews",
         path: "/mock-interviews",
-      },
-      {
-        id: "skill-assessment",
-        icon: <FaCertificate />,
-        label: "Skill Assessment",
-        path: "/skill-assessment",
-      },
+      }
     ],
   };
 

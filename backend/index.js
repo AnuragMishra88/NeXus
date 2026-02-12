@@ -1,3 +1,4 @@
+// backend/index.js (Update with quizroutes)
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -6,12 +7,10 @@ import connectDB from "./utils/db.js";
 import userRoute from "./routes/user.route.js";
 import notesRoute from "./routes/notes.route.js";
 import resumeRoutes from './routes/resume.route.js';
-
-
+import quizroutes from './routes/quiz.route.js'; // ADD THIS
 
 import path from "path";
 dotenv.config({});
-// https://gemini.google.com/share/16899e747265
 
 const app = express();
 const __dirname = path.resolve();
@@ -22,20 +21,19 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 const corsOptions = {
-    origin: "http://localhost:5173", // CHANGED THIS
+    origin: "http://localhost:5173",
     credentials: true
 }
 
 app.use(cors(corsOptions));
 
-const PORT = process.env.PORT || 8000; // CHANGED THIS
-
+const PORT = process.env.PORT || 8000;
 
 // api's
 app.use("/api/v1/user", userRoute);
-app.use("/api/v1/notes", notesRoute); // Add this line
+app.use("/api/v1/notes", notesRoute);
 app.use('/api/v1/user/resume', resumeRoutes);
-
+app.use('/api/v1/quiz', quizroutes); // ADD THIS - QUIZ ROUTES
 
 // app.use(express.static(path.join(__dirname,"/frontend/dist")))
 // app.get('*',(_,res)=>{
@@ -44,5 +42,6 @@ app.use('/api/v1/user/resume', resumeRoutes);
 
 app.listen(PORT,()=>{
     connectDB();
-console.log(`Server running at http://localhost:${PORT}`);
-})
+    console.log(`🚀 Server running at http://localhost:${PORT}`);
+    console.log(`📝 Quiz Bank API available at http://localhost:${PORT}/api/v1/quiz`);
+});

@@ -1,3 +1,4 @@
+// frontend/src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from './Api/AuthContext'; 
@@ -9,10 +10,11 @@ import Register from './Pages/Homepage/Auth/Register';
 import SmartNotes from './Component/Academic/SmartNotes'; 
 import Profile from './Pages/Profile';
 import ResumeAnalyzer from './Component/Career/ResumeAnalyzer';
-
+import QuizBank from './Component/Academic/Quiz/QuizBank'; // FIXED: Correct path for Academic Quiz
+import SkillAssessment from './Component/Career/Quiz/SkillAssessment';
 // Import FAQ and About Us pages
-import FAQ from './Pages/Homepage/Faq'; // Adjust path as needed
-import AboutUs from './Pages/Homepage/Aboutus'; // Adjust path as needed
+import FAQ from './Pages/Homepage/Faq';
+import AboutUs from './Pages/Homepage/Aboutus';
 
 import './App.css';
 
@@ -21,7 +23,6 @@ function App() {
   const [activePage, setActivePage] = useState('home');
   const [selectedMode, setSelectedMode] = useState('Academic');
 
-  // If still loading auth state, show loading
   if (loading) {
     return (
       <div className="loading-container" style={{display:'flex', justifyContent:'center', alignItems:'center', height:'100vh'}}>
@@ -61,6 +62,7 @@ function App() {
             <Route path="/doubt-solver" element={<div>Doubt Solver Page</div>} />
             <Route path="/study-scheduler" element={<div>Study Scheduler Page</div>} />
             <Route path="/progress-analytics" element={<div>Progress Analytics Page</div>} />
+            <Route path="/quiz-bank" element={<QuizBank setActivePage={setActivePage} />} /> {/* FIXED: Now points to Academic Quiz */}
             
             {/* Career feature routes */}
             <Route path="/resume-analyzer" element={<ResumeAnalyzer setActivePage={setActivePage} />} />
@@ -69,8 +71,9 @@ function App() {
             <Route path="/interview-simulator" element={<div>Interview Simulator Page</div>} />
             <Route path="/coding-platforms" element={<div>Coding Platforms Page</div>} />
             <Route path="/portfolio-builder" element={<div>Portfolio Builder Page</div>} />
+            <Route path="/skill-assessment" element={<SkillAssessment setActivePage={setActivePage} />}  />
             
-            {/* FAQ and About Us routes - Public routes accessible to everyone */}
+            {/* FAQ and About Us routes */}
             <Route path="/faq" element={<FAQ setActivePage={setActivePage} />} />
             <Route path="/about" element={<AboutUs setActivePage={setActivePage} />} />
             
