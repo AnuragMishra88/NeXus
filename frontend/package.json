@@ -10,9 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.60.0",
     "@fortawesome/fontawesome-free": "^7.1.0",
     "axios": "^1.13.5",
     "file-saver": "^2.0.5",
+    "framer-motion": "^12.34.0",
     "jszip": "^3.10.1",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^5.4.394",

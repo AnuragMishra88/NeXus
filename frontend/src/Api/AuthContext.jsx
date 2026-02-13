@@ -8,12 +8,18 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Cookie-based auth - just check if user exists
+  const isAuthenticated = !!user;
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         const response = await authService.getProfile();
-        setUser(response.user);
+        if (response?.user) {
+          setUser(response.user);
+        }
       } catch (err) {
+        console.log('Not authenticated');
         setUser(null);
       } finally {
         setLoading(false);
@@ -24,12 +30,16 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     setLoading(true);
+    setError(null);
     try {
       const response = await authService.login(email, password);
-      setUser(response.user);
+      if (response.success) {
+        const profile = await authService.getProfile();
+        setUser(profile.user);
+      }
       return response;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Login failed');
       throw err;
     } finally {
       setLoading(false);
@@ -38,12 +48,16 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     setLoading(true);
+    setError(null);
     try {
       const response = await authService.register(userData);
-      setUser(response.user);
+      if (response.success) {
+        const profile = await authService.getProfile();
+        setUser(profile.user);
+      }
       return response;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Registration failed');
       throw err;
     } finally {
       setLoading(false);
@@ -53,14 +67,23 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await authService.logout();
-      setUser(null);
     } catch (err) {
       console.error("Logout failed", err);
+    } finally {
+      setUser(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      error, 
+      isAuthenticated,
+      login, 
+      register, 
+      logout
+    }}>
       {children}
     </AuthContext.Provider>
   );

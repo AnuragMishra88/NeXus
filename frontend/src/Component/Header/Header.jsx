@@ -1,16 +1,43 @@
 import './Header.css';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../Api/AuthContext'; // Integrated AuthContext
+import { useAuth } from '../../Api/AuthContext'; 
+// 1. Import Clerk hooks for state and logout
+import { useUser, useClerk } from '@clerk/clerk-react'; 
 import nexus_logo from '../../assets/nexus.png';
-import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa'; // Icons for the profile
+import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth(); // Accessing user and logout
+  
+  // 2. Access both manual and Clerk (Google) auth states
+  const { user: manualUser, logout: manualLogout } = useAuth();
+  const { user: clerkUser, isSignedIn } = useUser();
+  const { signOut } = useClerk();
 
+  // 3. Determine which user data to display
+  const currentUser = isSignedIn ? {
+    fullName: clerkUser.fullName,
+    firstName: clerkUser.firstName,
+    profilePhoto: clerkUser.imageUrl,
+    isClerk: true
+  } : manualUser;
+
+  // 4. FIXED: Combined logout handler to clear both sessions in one click
   const handleLogout = async () => {
-    await logout();
-    navigate('/');
+    try {
+      // Clear Clerk session if active
+      if (isSignedIn) {
+        await signOut(); 
+      }
+      
+      // Always trigger manual logout to clear MongoDB cookies/JWT
+      await manualLogout(); 
+      
+      // Navigate home after both are cleared
+      navigate('/');
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (
@@ -24,19 +51,23 @@ const Header = () => {
       </div>
 
       <div className="header-right">
-        {user ? (
-          /* SHOW IF LOGGED IN */
+        {currentUser ? (
           <div className="user-section">
             <div className="user-info" onClick={() => navigate('/profile')}>
-              <FaUserCircle className="user-icon" />
-              <span className="user-name">Hi, {user.fullName.split(' ')[0]}</span>
+              {currentUser.profilePhoto ? (
+                <img src={currentUser.profilePhoto} className="user-avatar-img" alt="profile" style={{width: 30, height: 30, borderRadius: '50%'}} />
+              ) : (
+                <FaUserCircle className="user-icon" />
+              )}
+              <span className="user-name">
+                Hi, {currentUser.isClerk ? currentUser.firstName : currentUser.fullName.split(' ')[0]}
+              </span>
             </div>
             <button className="auth-btn secondary logout-btn" onClick={handleLogout}>
               <FaSignOutAlt />
             </button>
           </div>
         ) : (
-          /* SHOW IF LOGGED OUT */
           <>
             <button className="auth-btn secondary" onClick={() => navigate('/signin')}>
               Sign In

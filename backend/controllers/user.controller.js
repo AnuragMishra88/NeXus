@@ -4,180 +4,132 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
 
+// --- REGISTER CONTROLLER ---
 export const register = async (req, res) => {
-  try {
-    const {
-      fullName,
-      email,
-      phoneNumber,
-      password,
-      collegeName,
-      degree,
-      specialization,
-      graduationYear,
-      cgpa,
-      tenthPercentage,
-      twelfthPercentage,
-      skills,
-      linkedinProfile,
-      location,
-      experienceLevel,
-      jobType,
-      preferredRole,
-    } = req.body;
+    try {
+        const { fullName, email, phoneNumber, password, collegeName, degree, specialization, graduationYear, cgpa, tenthPercentage, twelfthPercentage, skills, linkedinProfile, location, experienceLevel, jobType, preferredRole } = req.body;
 
-    // 1. Check Mandatory Fields
-    if (!fullName || !email || !phoneNumber || !password) {
-      return res
-        .status(400)
-        .json({ message: "Mandatory fields missing", success: false });
+        if (!fullName || !email || !phoneNumber || !password) {
+            return res.status(400).json({ message: "Mandatory fields missing", success: false });
+        }
+
+        // Always use lowercase for email matching
+        const cleanEmail = email.toLowerCase().trim();
+
+        const existingUser = await User.findOne({ email: cleanEmail });
+        if (existingUser) return res.status(400).json({ message: "User already exists", success: false });
+
+        const file = req.file;
+        let resumeUrl = "";
+        let resumeOriginalName = "";
+
+        if (file) {
+            const fileUri = getDataUri(file);
+            const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                resource_type: 'auto',
+                public_id: `resumes/${Date.now()}_${file.originalname.replace(".pdf", "")}`,
+            });
+            resumeUrl = cloudResponse.secure_url;
+            resumeOriginalName = file.originalname;
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await User.create({
+            fullName: fullName.trim(),
+            email: cleanEmail,
+            phoneNumber: phoneNumber.trim(),
+            password: hashedPassword,
+            collegeUniversity: collegeName || "Not provided",
+            degreeProgram: degree || "Other",
+            specialization: specialization || "",
+            graduationYear: Number(graduationYear) || 2026,
+            currentCGPA: Number(cgpa) || 0,
+            tenthPercentage: Number(tenthPercentage) || 0,
+            twelfthPercentage: Number(twelfthPercentage) || 0,
+            linkedInProfile: linkedinProfile || "",
+            preferredLocation: location || "",
+            experienceLevel: experienceLevel || "Fresher",
+            jobType: jobType || "Full-time",
+            preferredRole: preferredRole || "",
+            skills: skills ? skills.split(",") : [],
+            resumeUrl,
+            resumeOriginalName,
+        });
+
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
+
+        return res.status(201).cookie("token", token, { maxAge: 86400000, httpOnly: true, sameSite: "strict" }).json({
+            message: "Account created successfully",
+            user: { _id: user._id, fullName: user.fullName },
+            success: true,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Server Error: " + error.message, success: false });
     }
-
-    // 2. Check if user exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-    if (existingUser)
-      return res
-        .status(400)
-        .json({ message: "User already exists", success: false });
-
-    // 3. Handle Resume File Upload (If provided during registration)
-    const file = req.file;
-    let resumeUrl = "";
-    let resumeOriginalName = "";
-
-    if (file) {
-    const fileUri = getDataUri(file);
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-        resource_type: 'auto', // Changed from 'raw' to 'auto'
-        public_id: `resumes/${Date.now()}_${file.originalname.replace(".pdf", "")}`,
-        flags: 'attachment:false', // Add this
-        transformation: [
-            { flags: 'attachment:false' }
-        ]
-    });
-    resumeUrl = cloudResponse.secure_url;
-    resumeOriginalName = file.originalname;
-}
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 4. Create User with all fields + resumeUrl
-    const user = await User.create({
-      fullName: fullName.trim(),
-      email: email.toLowerCase().trim(),
-      phoneNumber: phoneNumber.trim(),
-      password: hashedPassword,
-      collegeUniversity: collegeName || "Not provided",
-      degreeProgram: degree || "Other",
-      specialization: specialization || "",
-      graduationYear: Number(graduationYear) || 2026,
-      currentCGPA: Number(cgpa) || 0,
-      tenthPercentage: Number(tenthPercentage) || 0,
-      twelfthPercentage: Number(twelfthPercentage) || 0,
-      linkedInProfile: linkedinProfile || "",
-      preferredLocation: location || "",
-      experienceLevel: experienceLevel || "Fresher",
-      jobType: jobType || "Full-time",
-      preferredRole: preferredRole || "",
-      skills: skills ? skills.split(",") : [],
-      resumeUrl: resumeUrl, // SAVING THE CLOUDINARY URL HERE
-      resumeOriginalName: resumeOriginalName,
-    });
-
-    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
-      expiresIn: "1d",
-    });
-
-    return res
-      .status(201)
-      .cookie("token", token, {
-        maxAge: 1 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: "strict",
-      })
-      .json({
-        message: "Account created successfully",
-        user: { _id: user._id, fullName: user.fullName },
-        success: true,
-      });
-  } catch (error) {
-    console.error("🔥 REGISTER ERROR:", error);
-    return res
-      .status(500)
-      .json({ message: "Server Error: " + error.message, success: false });
-  }
 };
 
+// --- LOGIN CONTROLLER (The Gatekeeper) ---
 export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password, clerkId, fullName } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        message: "Email and password are required",
-        success: false,
-      });
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required", success: false });
+        }
+
+        const cleanEmail = email.toLowerCase().trim();
+        let user = await User.findOne({ email: cleanEmail });
+
+        // AUTO-REGISTRATION LOGIC
+        if (!user && password === "GOOGLE_AUTH_VERIFIED") {
+            console.log("New Google user detected. Registering...");
+            user = await User.create({
+                fullName: fullName || "Google User",
+                email: cleanEmail,
+                clerkId: clerkId,
+                // Default values for mandatory fields since Google doesn't provide them
+                phoneNumber: "Not provided", 
+                password: await bcrypt.hash(Math.random().toString(36), 10), // Random password for security
+                collegeUniversity: "Not provided",
+                degreeProgram: "Other",
+                skills: []
+            });
+        } else if (!user) {
+            // Standard rejection for manual login if user doesn't exist
+            return res.status(404).json({ message: "User not found", success: false });
+        }
+
+        // Password Verification Logic
+        if (password !== "GOOGLE_AUTH_VERIFIED") {
+            const isPasswordMatch = await bcrypt.compare(password, user.password);
+            if (!isPasswordMatch) {
+                return res.status(400).json({ message: "Incorrect email or password", success: false });
+            }
+        }
+
+        // Link Clerk ID if not already linked
+        if (clerkId && !user.clerkId) {
+            user.clerkId = clerkId;
+            await user.save();
+        }
+
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
+
+        return res.status(200).cookie("token", token, { 
+            maxAge: 86400000, 
+            httpOnly: true, 
+            sameSite: "strict" 
+        }).json({
+            message: user.isNew ? "Registration successful via Google" : `Welcome back ${user.fullName}`,
+            user: { _id: user._id, fullName: user.fullName, email: user.email },
+            success: true,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Auth failed: " + error.message, success: false });
     }
-
-    let user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
-      return res.status(400).json({
-        message: "Incorrect email or password",
-        success: false,
-      });
-    }
-
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) {
-      return res.status(400).json({
-        message: "Incorrect email or password",
-        success: false,
-      });
-    }
-
-    const tokenData = {
-      userId: user._id,
-      email: user.email,
-      role: user.role,
-    };
-    const token = await jwt.sign(tokenData, process.env.SECRET_KEY, {
-      expiresIn: "1d",
-    });
-
-    // Prepare user response
-    const userResponse = {
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      role: user.role,
-      profilePhoto: user.profilePhoto,
-      collegeUniversity: user.collegeUniversity,
-      degreeProgram: user.degreeProgram,
-      graduationYear: user.graduationYear,
-      resumeUrl: user.resumeUrl,
-    };
-
-    return res
-      .status(200)
-      .cookie("token", token, {
-        maxAge: 1 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: "strict",
-      })
-      .json({
-        message: `Welcome back ${user.fullName}`,
-        user: userResponse,
-        success: true,
-      });
-  } catch (error) {
-    console.log("🔥 LOGIN ERROR:", error.message);
-    return res.status(500).json({
-      message: "Login failed: " + error.message,
-      success: false,
-    });
-  }
 };
-
+// ... keep your existing logout, updateProfile, getProfile, and uploadProfilePhoto as they were
 export const logout = async (req, res) => {
   try {
     return res.status(200).cookie("token", "", { maxAge: 0 }).json({

@@ -461,6 +461,330 @@ Generate exactly {num_questions} questions.""",
             "correct_answers": correct_answers,
             "detailed_results": detailed_results
         }
+        
+# ==================== NEW CAREER ROADMAP MODELS ====================
+class CareerRoadmapRequest(BaseModel):
+    current_role: str
+    target_role: str
+    experience_level: str = "entry"  # entry, mid, senior
+    time_frame: str = "6 months"  # 3 months, 6 months, 1 year, 2 years
+    skills: str = ""  # Optional current skills
+
+class CareerRoadmapResponse(BaseModel):
+    target_role: str
+    summary: str
+    phases: List[dict]
+    skills_to_learn: List[str]
+    certifications: List[dict]
+    projects: List[dict]
+    resources: List[dict]
+    salary_progression: List[dict]
+    market_demand: str
+    timeline_months: int
+    difficulty_level: str
+    success_stories: List[str]
+    daily_schedule: dict
+
+# ==================== CAREER ROADMAP GENERATOR ====================
+class CareerRoadmapGenerator:
+    def __init__(self):
+        try:
+            self.llm = ChatGroq(
+                groq_api_key=GROQ_API_KEY,
+                model_name="llama-3.1-8b-instant",
+                temperature=0.4,
+                max_tokens=5000
+            )
+            print("✅ Groq Career Roadmap Generator initialized")
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            self.llm = None
+        
+        self.parser = StrOutputParser()
+        
+        self.roadmap_prompt = PromptTemplate(
+            template="""You are an elite career strategist and technical mentor. Create an EXCITING, VISUALLY-APPEALING career roadmap that will inspire and motivate.
+
+CURRENT ROLE: {current_role}
+TARGET ROLE: {target_role}
+EXPERIENCE: {experience_level}
+TIMELINE: {time_frame}
+CURRENT SKILLS: {skills}
+
+Generate a comprehensive, beautifully structured roadmap in this EXACT JSON format:
+
+{{
+  "summary": "Inspirational 3-sentence overview of this career transformation journey",
+  
+  "phases": [
+    {{
+      "phase": 1,
+      "name": "⚡ Foundation Storm",
+      "duration": "First 25% of timeline",
+      "icon": "🚀",
+      "color": "#3b82f6",
+      "topics": ["Topic 1", "Topic 2", "Topic 3", "Topic 4", "Topic 5"],
+      "exercises": ["Hands-on task 1", "Hands-on task 2", "Hands-on task 3"],
+      "projects": ["Mini project 1", "Mini project 2"],
+      "milestone": "What you'll achieve",
+      "motivation": "Inspiring quote or push"
+    }},
+    // Similar for phases 2, 3, 4 with different icons and colors
+  ],
+  
+  "skills_to_learn": [
+    "🎯 Priority Skill 1",
+    "🎯 Priority Skill 2", 
+    "🎯 Priority Skill 3",
+    "✨ Nice-to-have Skill 1",
+    "✨ Nice-to-have Skill 2"
+  ],
+  
+  "certifications": [
+    {{
+      "name": "Certification Name",
+      "provider": "Provider Name",
+      "icon": "🏆",
+      "duration": "X weeks",
+      "cost": "Free/Premium",
+      "relevance": 9,
+      "url": "Official URL",
+      "badge_color": "gold/silver/bronze"
+    }}
+  ],
+  
+  "projects": [
+    {{
+      "name": "Project Name",
+      "difficulty": "Beginner/Intermediate/Advanced",
+      "impact": "What it demonstrates",
+      "technologies": ["Tech1", "Tech2"],
+      "estimated_time": "X weeks",
+      "portfolio_worth": "⭐⭐⭐⭐⭐"
+    }}
+  ],
+  
+  "resources": [
+    {{
+      "type": "📚 Course",
+      "name": "Resource name",
+      "platform": "Platform",
+      "duration": "X hours",
+      "cost": "Free/Paid",
+      "rating": 4.8,
+      "url": "#"
+    }}
+  ],
+  
+  "salary_progression": [
+    {{
+      "stage": "Entry Level",
+      "salary": "$XX,XXX - $XX,XXX",
+      "timeframe": "0-1 year"
+    }},
+    {{
+      "stage": "Mid Level",
+      "salary": "$XX,XXX - $XX,XXX", 
+      "timeframe": "1-3 years"
+    }},
+    {{
+      "stage": "Senior Level",
+      "salary": "$XX,XXX - $XX,XXX",
+      "timeframe": "3-5 years"
+    }}
+  ],
+  
+  "market_demand": "High/Medium/Low - Detailed description",
+  "difficulty_level": "🌟 Beginner Friendly/⭐⭐ Intermediate/⭐⭐⭐ Challenging",
+  "timeline_months": 6,
+  
+  "success_stories": [
+    "Story 1 - Realistic inspiring example",
+    "Story 2 - Another transformation story"
+  ],
+  
+  "daily_schedule": {{
+    "morning": "30 mins - Learning concepts",
+    "afternoon": "1 hour - Hands-on practice",
+    "evening": "30 mins - Project work",
+    "weekly": "Weekend project time"
+  }}
+}}
+
+Make it visually descriptive, use emojis, make each phase exciting with different themes like:
+Phase 1: Foundation Storm ⚡
+Phase 2: Skill Surge 🌊  
+Phase 3: Project Peak 🏔️
+Phase 4: Mastery Launch 🚀
+
+Use colors: #3b82f6 (blue), #10b981 (green), #8b5cf6 (purple), #f59e0b (orange)""",
+            input_variables=["current_role", "target_role", "experience_level", "time_frame", "skills"]
+        )
+    
+    def generate_roadmap(self, current_role: str, target_role: str, experience_level: str, time_frame: str, skills: str = "") -> dict:
+        if self.llm is None:
+            return self.fallback_roadmap(current_role, target_role)
+        
+        try:
+            chain = self.roadmap_prompt | self.llm | self.parser
+            result = chain.invoke({
+                "current_role": current_role,
+                "target_role": target_role,
+                "experience_level": experience_level,
+                "time_frame": time_frame,
+                "skills": skills if skills else "No specific skills mentioned"
+            })
+            
+            json_match = re.search(r'\{.*\}', result, re.DOTALL)
+            if json_match:
+                return json.loads(json_match.group())
+            else:
+                return self.fallback_roadmap(current_role, target_role)
+                
+        except Exception as e:
+            print(f"Roadmap generation error: {e}")
+            return self.fallback_roadmap(current_role, target_role)
+    
+    def fallback_roadmap(self, current_role: str, target_role: str) -> dict:
+        return {
+            "summary": f"Transform from {current_role} to {target_role} with this exciting journey!",
+            "phases": [
+                {
+                    "phase": 1,
+                    "name": "⚡ Foundation Storm",
+                    "duration": "Weeks 1-4",
+                    "icon": "🚀",
+                    "color": "#3b82f6",
+                    "topics": ["Core Concepts", "Essential Tools", "Best Practices"],
+                    "exercises": ["Daily coding", "Build simple apps"],
+                    "projects": ["Portfolio website", "Basic CRUD app"],
+                    "milestone": "Strong foundation built",
+                    "motivation": "Every expert was once a beginner!"
+                }
+            ],
+            "skills_to_learn": ["🎯 Python", "🎯 JavaScript", "🎯 SQL", "✨ Git", "✨ REST APIs"],
+            "certifications": [
+                {
+                    "name": "Professional Certification",
+                    "provider": "Industry Leader",
+                    "icon": "🏆",
+                    "duration": "12 weeks",
+                    "cost": "Premium",
+                    "relevance": 9,
+                    "badge_color": "gold"
+                }
+            ],
+            "projects": [
+                {
+                    "name": "Capstone Project",
+                    "difficulty": "Advanced",
+                    "impact": "Shows full-stack expertise",
+                    "technologies": ["React", "Node.js", "MongoDB"],
+                    "estimated_time": "4 weeks",
+                    "portfolio_worth": "⭐⭐⭐⭐⭐"
+                }
+            ],
+            "resources": [
+                {
+                    "type": "📚 Course",
+                    "name": "Complete Career Path",
+                    "platform": "Top Platform",
+                    "duration": "40 hours",
+                    "cost": "Free",
+                    "rating": 4.9
+                }
+            ],
+            "salary_progression": [
+                {"stage": "Entry Level", "salary": "$60,000 - $80,000", "timeframe": "0-1 year"},
+                {"stage": "Mid Level", "salary": "$80,000 - $110,000", "timeframe": "1-3 years"},
+                {"stage": "Senior Level", "salary": "$110,000 - $150,000", "timeframe": "3-5 years"}
+            ],
+            "market_demand": "🔥 High - Growing rapidly",
+            "difficulty_level": "⭐⭐ Intermediate",
+            "timeline_months": 6,
+            "success_stories": [
+                "Sarah transitioned in 8 months and now works at Google",
+                "Mike built 3 projects and got hired within 6 months"
+            ],
+            "daily_schedule": {
+                "morning": "30 mins - Theory",
+                "afternoon": "1 hour - Practice",
+                "evening": "30 mins - Projects",
+                "weekly": "Build something new"
+            }
+        }
+
+# Initialize Career Roadmap Generator
+career_roadmap_generator = CareerRoadmapGenerator()
+
+# ==================== CAREER ROADMAP ENDPOINTS ====================
+@app.post("/career/roadmap/generate")
+async def generate_career_roadmap(request: CareerRoadmapRequest):
+    """Generate personalized career roadmap"""
+    if not request.current_role.strip() or not request.target_role.strip():
+        raise HTTPException(400, "Current role and target role are required")
+    
+    roadmap = career_roadmap_generator.generate_roadmap(
+        current_role=request.current_role,
+        target_role=request.target_role,
+        experience_level=request.experience_level,
+        time_frame=request.time_frame,
+        skills=request.skills
+    )
+    
+    return {
+        "success": True,
+        "current_role": request.current_role,
+        "target_role": request.target_role,
+        "roadmap": roadmap
+    }
+
+@app.get("/career/roadmap/trending")
+async def get_trending_careers():
+    """Get trending career paths"""
+    trending = [
+        {
+            "role": "AI Engineer",
+            "growth": "+45%",
+            "demand": "🔥🔥🔥",
+            "avg_salary": "$145,000",
+            "icon": "🤖",
+            "color": "#8b5cf6"
+        },
+        {
+            "role": "Cloud Architect",
+            "growth": "+32%",
+            "demand": "🔥🔥🔥",
+            "avg_salary": "$155,000",
+            "icon": "☁️",
+            "color": "#3b82f6"
+        },
+        {
+            "role": "DevOps Engineer",
+            "growth": "+28%",
+            "demand": "🔥🔥",
+            "avg_salary": "$135,000",
+            "icon": "⚙️",
+            "color": "#10b981"
+        },
+        {
+            "role": "Data Scientist",
+            "growth": "+25%",
+            "demand": "🔥🔥",
+            "avg_salary": "$140,000",
+            "icon": "📊",
+            "color": "#f59e0b"
+        },
+        {
+            "role": "Cybersecurity Analyst",
+            "growth": "+35%",
+            "demand": "🔥🔥🔥",
+            "avg_salary": "$125,000",
+            "icon": "🛡️",
+            "color": "#ef4444"
+        }
+    ]
+    return {"success": True, "trending": trending}
 
 # ==================== Initialize Services ====================
 summarizer = GroqSummarizer()  # EXISTING - DO NOT MODIFY
