@@ -18,6 +18,7 @@ import FAQ from './Pages/Homepage/Faq';
 import AboutUs from './Pages/Homepage/Aboutus';
 
 import './App.css';
+import CodingPlatform from './Component/Career/CodingPlatform';
 
 function App() {
   const { user, loading } = useAuth();
@@ -104,7 +105,7 @@ function App() {
             <Route path="/roadmap" element={<CareerRoadmap setActivePage={setActivePage} />} />
             <Route path="/qa-assistant" element={<div>Q&A Assistant Page</div>} />
             <Route path="/interview-simulator" element={<div>Interview Simulator Page</div>} />
-            <Route path="/coding-platforms" element={<div>Coding Platforms Page</div>} />
+            <Route path="/coding-platforms" element={<CodingPlatform setActivePage={setActivePage} />} />
             <Route path="/portfolio-builder" element={<div>Portfolio Builder Page</div>} />
             <Route path="/skill-assessment" element={<SkillAssessment setActivePage={setActivePage} />} />
 
