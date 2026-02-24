@@ -16,6 +16,7 @@ import SkillAssessment from './Component/Career/Quiz/SkillAssessment';
 import CareerRoadmap from './Component/Career/CareerRoadmap';
 import FAQ from './Pages/Homepage/Faq';
 import AboutUs from './Pages/Homepage/Aboutus';
+import Dsasheet from './Pages/Dsasheet';
 
 import './App.css';
 import CodingPlatform from './Component/Career/CodingPlatform';
@@ -108,7 +109,7 @@ function App() {
             <Route path="/coding-platforms" element={<CodingPlatform setActivePage={setActivePage} />} />
             <Route path="/portfolio-builder" element={<div>Portfolio Builder Page</div>} />
             <Route path="/skill-assessment" element={<SkillAssessment setActivePage={setActivePage} />} />
-
+             <Route path="/dsa-sheet" element={<Dsasheet setActivePage={setActivePage} />} />
             {/* Info Routes */}
             <Route path="/faq" element={<FAQ setActivePage={setActivePage} />} />
             <Route path="/about" element={<AboutUs setActivePage={setActivePage} />} />

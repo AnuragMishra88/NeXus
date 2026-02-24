@@ -147,6 +147,12 @@ const Navbar = ({
         path: "/roadmap",
       },
       {
+        id: "DSA Sheet",
+        icon: <FaBriefcase />,
+        label: "DSA Sheet",
+        path: "/dsa-sheet",
+      },
+      {
         id: "qa-assistant",
         icon: <FaComments />,
         label: "Q&A Assistant",
@@ -164,12 +170,7 @@ const Navbar = ({
         label: "Coding Platforms",
         path: "/coding-platforms",
       },
-      {
-        id: "portfolio-builder",
-        icon: <FaBriefcase />,
-        label: "Portfolio Builder",
-        path: "/portfolio-builder",
-      },
+      
       {
         id: "linkedin-optimizer",
         icon: <FaUsers />,
