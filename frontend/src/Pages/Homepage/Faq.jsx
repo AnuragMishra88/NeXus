@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './FAQ.css';
+import './Faq.css';
 import { 
   FaGraduationCap, FaBriefcase, FaCog, FaSearch, 
   FaTimes, FaArrowRight, FaCheck, FaBook, 
