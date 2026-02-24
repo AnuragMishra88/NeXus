@@ -2,7 +2,7 @@
 const axios = require('axios');
 
 // FastAPI service URL
-const FASTAPI_URL = 'http://127.0.0.1:8001';
+const FASTAPI_URL = process.env.FASTAPI_URL || 'http://127.0.0.1:8001';
 
 /**
  * @desc    Generate quiz questions using Groq via FastAPI

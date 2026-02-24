@@ -13,7 +13,9 @@ const SmartNotes = () => {
     
     const fileInputRef = useRef(null);
 
-    const API_BASE_URL = 'http://localhost:8000/api/v1/notes';
+    const API_BASE_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/notes` 
+  : 'http://localhost:8000/api/v1/notes';
 
     // Check summarizer service health on component mount
     useEffect(() => {

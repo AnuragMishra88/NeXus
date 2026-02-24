@@ -3,7 +3,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 
 // Use explicit IPv4 address instead of localhost
-const SUMMARIZER_URL = 'http://127.0.0.1:8001';  // Changed from localhost
+const SUMMARIZER_URL = process.env.FASTAPI_URL || 'http://127.0.0.1:8001';
 
 const summarizerClient = axios.create({
     baseURL: SUMMARIZER_URL,
