@@ -47,8 +47,8 @@ app.use("/api/v1/career/roadmap", careerRoadmapRoutes);
 //     res.sendFile(path.resolve(__dirname,"frontend","dist","index.html"));
 // })
 
+connectDB();
 app.listen(PORT, () => {
-  connectDB();
   console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log(`📝 Quiz Bank API available at http://localhost:${PORT}/api/v1/quiz`);
 });
