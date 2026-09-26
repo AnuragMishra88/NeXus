@@ -179,7 +179,7 @@ class GroqSummarizer:
             try:
                 self.llm = ChatGroq(
                     groq_api_key=self.groq_api_key,
-                    model_name="llama-3.1-8b-instant",
+                    model_name="openai/gpt-oss-20b",
                     temperature=0.2,
                     max_tokens=1024
                 )
@@ -243,7 +243,7 @@ class ResumeAnalyzer:
         try:
             self.llm = ChatGroq(
                 groq_api_key=GROQ_API_KEY,
-                model_name="llama-3.1-8b-instant",
+                model_name="openai/gpt-oss-20b",
                 temperature=0.3,
                 max_tokens=3000
             )
@@ -432,7 +432,7 @@ class QuizBank:
         try:
             self.llm = ChatGroq(
                 groq_api_key=GROQ_API_KEY,
-                model_name="llama-3.1-8b-instant",
+                model_name="openai/gpt-oss-20b",
                 temperature=0.4,
                 max_tokens=4000
             )
@@ -578,7 +578,7 @@ class CareerRoadmapGenerator:
         try:
             self.llm = ChatGroq(
                 groq_api_key=GROQ_API_KEY,
-                model_name="llama-3.1-8b-instant",
+                model_name="openai/gpt-oss-20b",
                 temperature=0.4,
                 max_tokens=5000
             )
